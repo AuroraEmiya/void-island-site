@@ -66,9 +66,9 @@ export default function ReturnMenus() {
             aria-label="切换日夜模式"
           >
             {isDarkMode ? (
-              <Sun size={20} strokeWidth={2} fill="none" />
-            ) : (
               <Moon size={20} strokeWidth={2} fill="none" />
+            ) : (
+              <Sun size={20} strokeWidth={2} fill="none" />
             )}
           </button>
         </div>
