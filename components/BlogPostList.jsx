@@ -54,18 +54,22 @@ export default function BlogPostList({
 				{new Date(post.date).toISOString().split("T")[0]}
 				{post.lastModified && (
 					<span className="ml-4 italic text-sm">
-						（最后编辑于 {new Date(post.lastModified).toLocaleString("zh-CN", {
-							year: "numeric",
-							month: "2-digit",
-							day: "2-digit",
-							hour: "2-digit",
-							minute: "2-digit",
-							second: "2-digit",
-							hour12: false
-						})}）
+					（最后编辑于{' '}
+					{new Intl.DateTimeFormat('zh-CN', {
+						year: 'numeric',
+						month: '2-digit',
+						day: '2-digit',
+						hour: '2-digit',
+						minute: '2-digit',
+						second: '2-digit',
+						hour12: false,
+						timeZone: 'Asia/Shanghai'
+					}).format(new Date(post.lastModified))}
+					）
 					</span>
 				)}
 			</p>
+
 			<p className="text-base text-white line-clamp-3 mb-2">
 				{post.excerpt}
 			</p>
