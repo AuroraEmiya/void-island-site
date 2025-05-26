@@ -16,6 +16,7 @@ export default function SectionDescription({ titleOff, description, mobile }) {
 		<div className="fixed bottom-4 right-6 bg-gray-700 text-white border-4 border-white p-6 max-w-xs rounded shadow-lg"
 		style={{
 			background: isDarkMode ? `#1f2937` : `rgba(0, 0, 0, 0.5)`,
+			zIndex: 5, // ✅ 确保在其他元素之上
 		}}
 		>
 			<h4 className="text-lg font-bold mb-2">{titleOff}</h4>
