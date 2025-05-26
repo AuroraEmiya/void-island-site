@@ -1,96 +1,108 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useFilter } from "@/components/FilterContext";
 import TopRightButton from "@/components/TopRightButton";
 import Link from "next/link";
 import sectionsConfig from "@/config/sections_config.json";
 import BlogModal from "@/components/BlogModal";
 import SelfIntroduction from "@/components/SelfIntroduction";
+import { usePathname } from "next/navigation";
 
 export default function HomeContent({ selfIntroPosts, headlinePosts }) {
-	const { filterOn } = useFilter();
-	const [isMobile, setIsMobile] = useState(false);
-	const [modalSlug, setModalSlug] = useState(null);
-	const [modalOpen, setModalOpen] = useState(false);
-	const openModal = (slug) => {
-		setModalSlug(slug);
-		setModalOpen(true);
-	};
+  const { filterOn } = useFilter();
+  const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState(false);
+  const [modalSlug, setModalSlug] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const openModal = (slug) => {
+    setModalSlug(slug);
+    setModalOpen(true);
+  };
 
-	const closeModal = () => {
-		setModalSlug(null);
-		setModalOpen(false);
-	};
+  const closeModal = () => {
+    setModalSlug(null);
+    setModalOpen(false);
+  };
 
-	const [animatedTitles, setAnimatedTitles] = useState(
-		sectionsConfig.mainSections.map((item) => ({
-			text: filterOn ? item.titleOn : item.titleOff,
-			color: item.color,
-			visible: true,
-			link: "/blog/" + item.title,
-		}))
-	);
+  const didMount = useRef(false);
+  // 初始设为空数组，避免初始渲染动画
+  const [animatedTitles, setAnimatedTitles] = useState([]);
 
-	useEffect(() => {
-		function handleResize() {
-			setIsMobile(window.innerWidth <= 768);
-		}
-		handleResize();
-		window.addEventListener("resize", handleResize);
-		return () => window.removeEventListener("resize", handleResize);
-	}, []);
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth <= 768);
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-	useEffect(() => {
-		const newTitles = sectionsConfig.mainSections.map((item) => ({
-			text: filterOn ? item.titleOn : item.titleOff,
-			color: item.color,
-			link: "/blog/" + item.title,
-		}));
+  // 监听路由变化，路径是首页时重置didMount，避免返回时触发动画
+  useEffect(() => {
+    if (pathname === "/") {
+      didMount.current = false;
+    }
+  }, [pathname]);
 
-		setAnimatedTitles((prev) =>
-			prev.map((item) => ({ ...item, visible: false }))
-		);
+  useEffect(() => {
+    const newTitles = sectionsConfig.mainSections.map((item) => ({
+      text: filterOn ? item.titleOn : item.titleOff,
+      color: item.color,
+      link: "/blog/" + item.title,
+    }));
 
-		const timeout = setTimeout(() => {
-			setAnimatedTitles(newTitles.map((item) => ({ ...item, visible: true })));
-		}, 100);
+    if (!didMount.current) {
+      // 首次加载，直接设置 visible，跳过动画
+      setAnimatedTitles(newTitles.map((item) => ({ ...item, visible: true })));
+      didMount.current = true;
+      return;
+    }
 
-		return () => clearTimeout(timeout);
-	}, [filterOn]);
+    // 后续切换，先隐藏再渐显动画
+    setAnimatedTitles((prev) =>
+      prev.map((item) => ({ ...item, visible: false }))
+    );
 
-	const selectedPost = selfIntroPosts.find((p) => p.slug === modalSlug);
+    const timeout = setTimeout(() => {
+      setAnimatedTitles(newTitles.map((item) => ({ ...item, visible: true })));
+    }, 200);
 
-	return (
-		<main
-			style={{
-				display: "flex",
-				flexDirection: "column",
-				alignItems: "center",
-				paddingTop: "100px",
-				paddingBottom: isMobile ? "80px" : "0px",
-			}}
-		>
-			{modalOpen && selectedPost && (
-				<BlogModal
-					title={selectedPost.title}
-					excerpt={selectedPost.excerpt}
-					content={selectedPost.content}
-					onClose={closeModal}
-					isMobile={isMobile}
-				/>
-			)}
-			<TopRightButton isMobile={isMobile} />
+    return () => clearTimeout(timeout);
+  }, [filterOn]);
 
-			<SelfIntroduction
-				isMobile={isMobile}
-				sectionsConfig={sectionsConfig}
-				openModal={openModal}
-			/>
+  const selectedPost = selfIntroPosts.find((p) => p.slug === modalSlug);
 
-<div
+  return (
+    <main
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        paddingTop: "100px",
+        paddingBottom: isMobile ? "80px" : "0px",
+      }}
+    >
+      {modalOpen && selectedPost && (
+        <BlogModal
+          title={selectedPost.title}
+          excerpt={selectedPost.excerpt}
+          content={selectedPost.content}
+          onClose={closeModal}
+          isMobile={isMobile}
+        />
+      )}
+      <TopRightButton isMobile={isMobile} />
+
+      <SelfIntroduction
+        isMobile={isMobile}
+        sectionsConfig={sectionsConfig}
+        openModal={openModal}
+      />
+
+      <div
         style={{
-          paddingTop: isMobile ? "15px" : "0px",  //手机端顶部留出阴影空隙
+          paddingTop: isMobile ? "15px" : "0px", //手机端顶部留出阴影空隙
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -107,10 +119,8 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
             style={{
               color: item.color,
               opacity: item.visible ? 1 : 0,
-              transform: item.visible ? "translateX(0)" : "20px",
-              transition: item.visible
-                ? "opacity 0.3s ease-in-out"
-                : "opacity 0.1s ease-in-out",
+              transform: item.visible ? "translateX(0)" : "translateX(20px)",
+              transition: "all 0.3s ease-in-out",
             }}
           >
             <Link href={item.link}>{item.text}</Link>
@@ -157,14 +167,16 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
         className="headline-box"
       >
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <h1 style={{ whiteSpace: "pre-line" , fontSize:"1.5em"}}>
-          系统公告📢
+          <h1 style={{ whiteSpace: "pre-line", fontSize: "1.5em" }}>
+            系统公告📢
           </h1>
           <h1 style={{ whiteSpace: "pre-line" }}>
             {sectionsConfig.headline.description}
           </h1>
         </div>
-        <div style={{ textAlign: "center", marginBottom: "20px", fontSize:"1.5em" }}>
+        <div
+          style={{ textAlign: "center", marginBottom: "20px", fontSize: "1.5em" }}
+        >
           <h1>实时更新⌚</h1>
         </div>
         {headlinePosts.map((post, index) => (
@@ -183,7 +195,6 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
           </div>
         ))}
       </div>
-
     </main>
   );
 }
