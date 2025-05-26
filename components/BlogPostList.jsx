@@ -50,22 +50,20 @@ export default function BlogPostList({
 			)}
 			</h3>
 
+			{/* 服务器不支持toLocalString的北京时间，手动解析 */}
 			<p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-200"} mb-2`}>
 				{new Date(post.date).toISOString().split("T")[0]}
 				{post.lastModified && (
 					<span className="ml-4 italic text-sm">
-					（最后编辑于{' '}
-					{new Intl.DateTimeFormat('zh-CN', {
-						year: 'numeric',
-						month: '2-digit',
-						day: '2-digit',
-						hour: '2-digit',
-						minute: '2-digit',
-						second: '2-digit',
-						hour12: false,
-						timeZone: 'Asia/Shanghai'
-					}).format(new Date(post.lastModified))}
-					）
+					（最后编辑于 {
+						(() => {
+						const d = new Date(post.lastModified)
+						// 将时间从 UTC 转换为 UTC+8（北京时间）
+						const beijing = new Date(d.getTime() + 8 * 60 * 60 * 1000)
+						const pad = (n) => String(n).padStart(2, '0')
+						return `${beijing.getFullYear()}-${pad(beijing.getMonth() + 1)}-${pad(beijing.getDate())} ${pad(beijing.getHours())}:${pad(beijing.getMinutes())}:${pad(beijing.getSeconds())}`
+						})()
+					}）
 					</span>
 				)}
 			</p>
