@@ -70,12 +70,10 @@ def get_blog_metadata(latest_logs):
         metadata = get_metadata(decoded_path)
         if metadata:
             title = metadata.get("title", "No title")
-            # 使用文件的最新修改时间作为日期
             timestamp = log['timestamp']
             date = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
             slug = os.path.splitext(os.path.basename(decoded_path))[0]
 
-            # 解析 section，例如 blog/tech/post.md → tech
             parts = decoded_path.replace("\\", "/").split("/")
             try:
                 blog_index = parts.index("blog")
@@ -85,14 +83,26 @@ def get_blog_metadata(latest_logs):
 
             blog_metadata.append({
                 "title": title,
-                "date": date,  # 使用修改时间的日期
+                "date": date,
                 "slug": slug,
                 "section": section
             })
     return blog_metadata
 
+def get_all_blog_last_modified():
+    last_modified_map = {}
+    blog_root = "blog"
+    for root, dirs, files in os.walk(blog_root):
+        for file in files:
+            if file.endswith(".md"):
+                full_path = os.path.join(root, file)
+                timestamp = os.path.getmtime(full_path)
+                iso_time = datetime.fromtimestamp(timestamp).isoformat()
+                rel_path = os.path.relpath(full_path).replace("\\", "/")
+                last_modified_map[rel_path] = iso_time
+    return last_modified_map
 
-def write_commit_log_js(blog_metadata):# 先清空 commit-log.js
+def write_commit_log_js(blog_metadata):
     try:
         if not blog_metadata:
             print("[ERROR] No metadata to write.")
@@ -106,7 +116,13 @@ def write_commit_log_js(blog_metadata):# 先清空 commit-log.js
                 "section": e["section"]
             } for e in blog_metadata
         ]
-        js_content = f"export const logs = {json.dumps(logs, indent=2)};"
+
+        last_modified = get_all_blog_last_modified()
+
+        js_content = (
+            "export const logs = " + json.dumps(logs, indent=2) + ";\n\n" +
+            "export const lastModified = " + json.dumps(last_modified, indent=2) + ";"
+        )
 
         with open(commit_log_js_file, "w", encoding="utf-8") as file:
             file.write(js_content)
