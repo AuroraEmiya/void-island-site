@@ -52,7 +52,8 @@ export default function BlogPostList({
 
 			<p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-200"} mb-2`}>
 				{new Date(post.date).toISOString().split("T")[0]}
-				{post.lastModified && (
+				{/* vercel无法访问最后编辑时间 */}
+				{/* {post.lastModified && (
 					<span className="ml-4 italic text-sm">
 					（最后编辑于{' '}
 					{new Intl.DateTimeFormat('zh-CN', {
@@ -67,7 +68,7 @@ export default function BlogPostList({
 					}).format(new Date(post.lastModified))}
 					）
 					</span>
-				)}
+				)} */}
 			</p>
 
 			<p className="text-base text-white line-clamp-3 mb-2">

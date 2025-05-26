@@ -1,8 +1,0 @@
-{
-    "build": {
-        "git": {
-        "enabled": true,
-        "depth": 0
-        }
-    }
-}
