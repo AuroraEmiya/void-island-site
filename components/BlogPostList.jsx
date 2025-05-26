@@ -55,7 +55,7 @@ export default function BlogPostList({
 				{new Date(post.date).toISOString().split("T")[0]}
 				{post.lastModified && (
 					<span className="ml-4 italic text-sm">
-					（最后编辑于 {
+					（最后提交时间 {
 						(() => {
 						const d = new Date(post.lastModified)
 						// 将时间从 UTC 转换为 UTC+8（北京时间）
