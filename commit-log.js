@@ -1,5 +1,11 @@
 export const logs = [
   {
+    "title": "\u5f62\u7b56\u4f5c\u4e1a",
+    "date": "2025-06-04 19:37:55",
+    "slug": "2025-6-4-\u5f62\u7b56\u4f5c\u4e1a",
+    "section": "cloud-leaf"
+  },
+  {
     "title": "\u5929\u5883\u4ecb\u7ecd",
     "date": "2025-06-01 22:37:24",
     "slug": "2025-6-1-\u5929\u5883\u4ecb\u7ecd",
@@ -22,12 +28,6 @@ export const logs = [
     "date": "2025-05-28 12:26:25",
     "slug": "2025-5-28-\u68a6\u65e5\u8bb0",
     "section": "star-dream"
-  },
-  {
-    "title": "\u7126\u8651\u8f6c\u5ac1\u548c\u88ab\u8695\u98df\u7684\u671f\u671b",
-    "date": "2025-05-28 00:47:11",
-    "slug": "2025-5-27-\u7126\u8651\u8f6c\u5ac1\u548c\u88ab\u8695\u98df\u7684\u671f\u671b",
-    "section": "cloud-leaf"
   }
 ];
 
@@ -37,6 +37,7 @@ export const lastModified = {
   "blog/cloud-leaf/2025-5-19-\u957f\u7ebfDDL\u4f5c\u6218\u8bb0\u5f55.md": "2025-05-21T01:05:30.036208",
   "blog/cloud-leaf/2025-5-27-\u7126\u8651\u8f6c\u5ac1\u548c\u88ab\u8695\u98df\u7684\u671f\u671b.md": "2025-05-28T00:47:11.311990",
   "blog/cloud-leaf/2025-5-29-\u4fdd\u5e9510\u8fde4\u4e2a\u4e09\u706f\u6709\u6ca1\u6709\u61c2\u7684.md": "2025-05-29T18:18:38.904479",
+  "blog/cloud-leaf/2025-6-4-\u5f62\u7b56\u4f5c\u4e1a.md": "2025-06-04T19:37:55.019408",
   "blog/fog-radio/2025-5-10-\u7b2c\u4e09\u6b21\u5faa\u73af.md": "2025-05-11T21:42:48.264108",
   "blog/fog-radio/2025-5-11-\u5faa\u73af\u7684\u7406\u7531.md": "2025-05-11T21:42:55.959760",
   "blog/island-world/2025-5-10-\u6e32\u67d3\u6d4b\u8bd5.md": "2025-05-11T03:08:56.865520",
