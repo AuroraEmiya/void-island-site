@@ -107,7 +107,7 @@
   ],
   "headline": 
   {
-    "description": "空岛当前季度：火鸣期-初-霜眠季"
+    "description": "空岛当前季度：火鸣期-中-轻弦季"
   },
   
   "selfIntroduce": 
@@ -133,6 +133,10 @@
       {
         "description": "非常感谢Ebit在我建站时的帮助！",
         "link": "https://ebotian-blog.vercel.app/"
+      }
+      {
+        "description": "欢迎大家去赤茶酱的主页玩！",
+        "link": "https://cynosura.one/"
       }
     ]
   }
