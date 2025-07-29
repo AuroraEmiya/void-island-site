@@ -1,5 +1,11 @@
 export const logs = [
   {
+    "title": "\u4eba\u751f\u76ee\u6807",
+    "date": "2025-07-30 00:16:19",
+    "slug": "Targets",
+    "section": "self-introduction"
+  },
+  {
     "title": "\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
     "date": "2025-07-27 03:12:51",
     "slug": "2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
@@ -40,6 +46,7 @@ export const lastModified = {
   "blog/island-world/2025-6-1-\u5929\u5883\u4ecb\u7ecd.md": "2025-06-01T22:37:24.039725",
   "blog/self-introduction/FavoriteAnimes.md": "2025-05-13T12:48:57.548650",
   "blog/self-introduction/FavoriteGames.md": "2025-07-11T18:09:38.248330",
+  "blog/self-introduction/Targets.md": "2025-07-30T00:16:19.141470",
   "blog/star-dream/2025-5-11-\u81ea\u7531\u7684\u610f\u4e49.md": "2025-05-11T21:34:40.363878",
   "blog/star-dream/2025-5-14-\u68a6\u65e5\u8bb0.md": "2025-05-16T10:20:52.375788",
   "blog/star-dream/2025-5-16-\u68a6\u65e5\u8bb0.md": "2025-05-16T10:20:24.677648",
