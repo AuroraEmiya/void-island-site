@@ -127,6 +127,10 @@
       {
         "description": "番剧喜好列表",
         "link": "FavoriteAnimes"
+      },
+      {
+        "description": "人生目标",
+        "link": "Targets"
       }
     ],
     "friendship_link": [
