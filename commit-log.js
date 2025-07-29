@@ -1,5 +1,11 @@
 export const logs = [
   {
+    "title": "\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
+    "date": "2025-07-30 01:11:17",
+    "slug": "2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
+    "section": "island-world"
+  },
+  {
     "title": "\u4eba\u751f\u76ee\u6807",
     "date": "2025-07-30 00:16:19",
     "slug": "Targets",
@@ -22,12 +28,6 @@ export const logs = [
     "date": "2025-06-27 22:35:47",
     "slug": "2025-06-26-\u50cf\u7d20\u753b\u5b66\u4e60\u7b14\u8bb0",
     "section": "white-hall"
-  },
-  {
-    "title": "\u300a\u54f2\u5b66\u5bb6\u4eec\u90fd\u5e72\u4e86\u4e9b\u4ec0\u4e48\u300b\u8bfb\u540e\u611f\u2014\u2014\u4e00\u4e2a\u7edd\u5bf9\u771f\u7406\u4e0d\u5b58\u5728\u7684\u4e16\u754c",
-    "date": "2025-06-10 13:39:37",
-    "slug": "2025-06-10-\u300a\u54f2\u5b66\u5bb6\u4eec\u90fd\u5e72\u4e86\u4e9b\u4ec0\u4e48\u300b\u8bfb\u540e\u611f\u2014\u2014\u4e00\u4e2a\u7edd\u5bf9\u771f\u7406\u4e0d\u5b58\u5728\u7684\u4e16\u754c",
-    "section": "white-hall"
   }
 ];
 
@@ -44,6 +44,7 @@ export const lastModified = {
   "blog/island-world/2025-5-12-\u7a7a\u5c9b\u9020\u7269\u4ecb\u7ecd.md": "2025-05-29T20:02:37.929659",
   "blog/island-world/2025-5-14-\u03a9\u7a7a\u5c9b\u7684\u79d8\u5bc6.md": "2025-05-14T03:59:29.070846",
   "blog/island-world/2025-6-1-\u5929\u5883\u4ecb\u7ecd.md": "2025-06-01T22:37:24.039725",
+  "blog/island-world/2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a.md": "2025-07-30T01:11:17.383039",
   "blog/self-introduction/FavoriteAnimes.md": "2025-05-13T12:48:57.548650",
   "blog/self-introduction/FavoriteGames.md": "2025-07-11T18:09:38.248330",
   "blog/self-introduction/Targets.md": "2025-07-30T00:16:19.141470",
