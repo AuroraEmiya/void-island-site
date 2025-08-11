@@ -1,5 +1,17 @@
 export const logs = [
   {
+    "title": "20250811\u68a6\u65e5\u8bb0\u7d20\u6750",
+    "date": "2025-08-11 16:05:14",
+    "slug": "2025-8-11-\u68a6\u65e5\u8bb0",
+    "section": "star-dream"
+  },
+  {
+    "title": "\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
+    "date": "2025-08-09 23:07:20",
+    "slug": "2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
+    "section": "white-hall"
+  },
+  {
     "title": "\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
     "date": "2025-07-30 01:11:17",
     "slug": "2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
@@ -12,22 +24,10 @@ export const logs = [
     "section": "self-introduction"
   },
   {
-    "title": "\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
-    "date": "2025-07-27 03:12:51",
-    "slug": "2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
-    "section": "white-hall"
-  },
-  {
     "title": "\u559c\u6b22\u7684\u6e38\u620f\u5217\u8868",
     "date": "2025-07-11 18:09:38",
     "slug": "FavoriteGames",
     "section": "self-introduction"
-  },
-  {
-    "title": "\u50cf\u7d20\u753b\u5b66\u4e60\u7b14\u8bb0",
-    "date": "2025-06-27 22:35:47",
-    "slug": "2025-06-26-\u50cf\u7d20\u753b\u5b66\u4e60\u7b14\u8bb0",
-    "section": "white-hall"
   }
 ];
 
@@ -56,8 +56,9 @@ export const lastModified = {
   "blog/star-dream/2025-5-21-\u68a6\u65e5\u8bb0.md": "2025-05-21T08:07:52.256917",
   "blog/star-dream/2025-5-22-\u521b\u4f5c\u7684\u610f\u4e49.md": "2025-05-21T09:01:10.816519",
   "blog/star-dream/2025-5-28-\u68a6\u65e5\u8bb0.md": "2025-05-28T12:26:25.409405",
+  "blog/star-dream/2025-8-11-\u68a6\u65e5\u8bb0.md": "2025-08-11T16:05:14.036513",
   "blog/white-hall/2025-05-12-\u524d\u7aef\u5f00\u53d1\u7ecf\u9a8c.md": "2025-05-14T03:06:39.947877",
   "blog/white-hall/2025-06-10-\u300a\u54f2\u5b66\u5bb6\u4eec\u90fd\u5e72\u4e86\u4e9b\u4ec0\u4e48\u300b\u8bfb\u540e\u611f\u2014\u2014\u4e00\u4e2a\u7edd\u5bf9\u771f\u7406\u4e0d\u5b58\u5728\u7684\u4e16\u754c.md": "2025-06-10T13:39:37.890620",
   "blog/white-hall/2025-06-26-\u50cf\u7d20\u753b\u5b66\u4e60\u7b14\u8bb0.md": "2025-06-27T22:35:47.807181",
-  "blog/white-hall/2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0.md": "2025-07-27T03:12:51.990469"
+  "blog/white-hall/2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0.md": "2025-08-09T23:07:20.867099"
 };
