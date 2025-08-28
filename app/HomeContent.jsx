@@ -1,34 +1,33 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useFilter } from "@/components/FilterContext";
 import TopRightButton from "@/components/TopRightButton";
 import Link from "next/link";
 import sectionsConfig from "@/config/sections_config.json";
 import BlogModal from "@/components/BlogModal";
 import SelfIntroduction from "@/components/SelfIntroduction";
-import { usePathname } from "next/navigation";
 
 export default function HomeContent({ selfIntroPosts, headlinePosts }) {
   const { filterOn } = useFilter();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
-  const [modalSlug, setModalSlug] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const modalSlug = searchParams.get("post");
   const openModal = (slug) => {
-    setModalSlug(slug);
-    setModalOpen(true);
+    router.replace(`/?post=${encodeURIComponent(slug)}`, { scroll: false });
   };
-
   const closeModal = () => {
-    setModalSlug(null);
-    setModalOpen(false);
+    router.replace(`/`, { scroll: false });
   };
 
   const didMount = useRef(false);
   // 初始设为空数组，避免初始渲染动画
   const [animatedTitles, setAnimatedTitles] = useState([]);
 
+  
   useEffect(() => {
     function handleResize() {
       setIsMobile(window.innerWidth <= 768);
@@ -83,7 +82,7 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
         paddingBottom: isMobile ? "80px" : "0px",
       }}
     >
-      {modalOpen && selectedPost && (
++     {modalSlug && selectedPost && (
         <BlogModal
           title={selectedPost.title}
           excerpt={selectedPost.excerpt}
@@ -177,7 +176,7 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
         <div
           style={{ textAlign: "center", marginBottom: "20px", fontSize: "1.5em" }}
         >
-          <h1>实时更新⌚</h1>
+        <h1>实时更新⌚</h1>
         </div>
         {headlinePosts.map((post, index) => (
           <div key={index} style={{ marginBottom: "10px", textAlign: "left" }}>
@@ -185,12 +184,27 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
               {post.date}｜{post.section}
             </div>
             <div style={{ fontSize: "1em" }}>
-              <a
-                href={`/blog/${post.section}?post=${post.slug}`}
-                style={{ color: "#fff", textDecoration: "underline" }}
-              >
-                {post.title}
-              </a>
+              {post.section === "self-introduction" ? (
+                // 个人介绍文章走主页弹窗逻辑
+                <a
+                  href={`/?post=${post.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault();       // 阻止默认跳转
+                    openModal(post.slug);     // 调用主页弹窗方法
+                  }}
+                  style={{ color: "#fff", textDecoration: "underline" }}
+                >
+                  {post.title}
+                </a>
+              ) : (
+                // 其他文章保持原有逻辑
+                <a
+                  href={`/blog/${post.section}?post=${post.slug}`}
+                  style={{ color: "#fff", textDecoration: "underline" }}
+                >
+                  {post.title}
+                </a>
+              )}
             </div>
           </div>
         ))}
