@@ -1,5 +1,17 @@
 export const logs = [
   {
+    "title": "\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
+    "date": "2025-08-28 22:53:52",
+    "slug": "2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
+    "section": "ark"
+  },
+  {
+    "title": "\u559c\u6b22\u7684\u756a\u5267\u5217\u8868",
+    "date": "2025-08-28 22:42:50",
+    "slug": "FavoriteAnimes",
+    "section": "self-introduction"
+  },
+  {
     "title": "\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
     "date": "2025-08-26 18:23:11",
     "slug": "2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
@@ -16,23 +28,11 @@ export const logs = [
     "date": "2025-07-30 01:11:17",
     "slug": "2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
     "section": "island-world"
-  },
-  {
-    "title": "\u4eba\u751f\u76ee\u6807",
-    "date": "2025-07-30 00:16:19",
-    "slug": "Targets",
-    "section": "self-introduction"
-  },
-  {
-    "title": "\u559c\u6b22\u7684\u6e38\u620f\u5217\u8868",
-    "date": "2025-07-11 18:09:38",
-    "slug": "FavoriteGames",
-    "section": "self-introduction"
   }
 ];
 
 export const lastModified = {
-  "blog/ark/2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7.md": "2025-05-27T00:05:48.808261",
+  "blog/ark/2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7.md": "2025-08-28T22:53:52.480022",
   "blog/ark/2025-5-25-\u6f6e\u6c50\u5468\u671f\u8ba1\u5212.md": "2025-06-04T19:41:29.107058",
   "blog/cloud-leaf/2025-5-19-\u957f\u7ebfDDL\u4f5c\u6218\u8bb0\u5f55.md": "2025-05-21T01:05:30.036208",
   "blog/cloud-leaf/2025-5-27-\u7126\u8651\u8f6c\u5ac1\u7406\u8bba.md": "2025-06-10T11:36:08.188149",
@@ -45,7 +45,7 @@ export const lastModified = {
   "blog/island-world/2025-5-14-\u03a9\u7a7a\u5c9b\u7684\u79d8\u5bc6.md": "2025-05-14T03:59:29.070846",
   "blog/island-world/2025-6-1-\u5929\u5883\u4ecb\u7ecd.md": "2025-06-01T22:37:24.039725",
   "blog/island-world/2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a.md": "2025-07-30T01:11:17.383039",
-  "blog/self-introduction/FavoriteAnimes.md": "2025-05-13T12:48:57.548650",
+  "blog/self-introduction/FavoriteAnimes.md": "2025-08-28T22:42:50.517352",
   "blog/self-introduction/FavoriteGames.md": "2025-07-11T18:09:38.248330",
   "blog/self-introduction/Targets.md": "2025-07-30T00:16:19.141470",
   "blog/star-dream/2025-5-11-\u81ea\u7531\u7684\u610f\u4e49.md": "2025-05-11T21:34:40.363878",
