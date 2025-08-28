@@ -1,7 +1,7 @@
 export const logs = [
   {
     "title": "\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
-    "date": "2025-08-20 23:00:57",
+    "date": "2025-08-26 18:23:11",
     "slug": "2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
     "section": "white-hall"
   },
@@ -60,5 +60,5 @@ export const lastModified = {
   "blog/white-hall/2025-05-12-\u524d\u7aef\u5f00\u53d1\u7ecf\u9a8c.md": "2025-05-14T03:06:39.947877",
   "blog/white-hall/2025-06-10-\u300a\u54f2\u5b66\u5bb6\u4eec\u90fd\u5e72\u4e86\u4e9b\u4ec0\u4e48\u300b\u8bfb\u540e\u611f\u2014\u2014\u4e00\u4e2a\u7edd\u5bf9\u771f\u7406\u4e0d\u5b58\u5728\u7684\u4e16\u754c.md": "2025-06-10T13:39:37.890620",
   "blog/white-hall/2025-06-26-\u50cf\u7d20\u753b\u5b66\u4e60\u7b14\u8bb0.md": "2025-06-27T22:35:47.807181",
-  "blog/white-hall/2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0.md": "2025-08-20T23:00:57.675041"
+  "blog/white-hall/2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0.md": "2025-08-26T18:23:11.669167"
 };
