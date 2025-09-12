@@ -1,14 +1,14 @@
 export const logs = [
   {
-    "title": "\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd\uff08\u8bbe\u5b9a\u8865\u5145\u4e2d...\uff09",
-    "date": "2025-09-12 20:42:17",
-    "slug": "2025-9-12-\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd",
+    "title": "\u7a7a\u5c9b\u5386\u4f53\u7cfb\u8bf4\u660e",
+    "date": "2025-09-12 20:46:25",
+    "slug": "2025-6-1-\u7a7a\u5c9b\u5386\u4f53\u7cfb\u8bf4\u660e",
     "section": "island-world"
   },
   {
-    "title": "\u7a7a\u5c9b\u5386\u4f53\u7cfb\u8bf4\u660e",
-    "date": "2025-09-12 20:38:31",
-    "slug": "2025-6-1-\u7a7a\u5c9b\u5386\u4f53\u7cfb\u8bf4\u660e",
+    "title": "\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd\uff08\u8bbe\u5b9a\u8865\u5145\u4e2d...\uff09",
+    "date": "2025-09-12 20:42:17",
+    "slug": "2025-9-12-\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd",
     "section": "island-world"
   },
   {
@@ -44,7 +44,7 @@ export const lastModified = {
   "blog/island-world/2025-5-12-\u7a7a\u5c9b\u9020\u7269\u4ecb\u7ecd.md": "2025-05-29T20:02:37.929659",
   "blog/island-world/2025-5-14-\u03a9\u7a7a\u5c9b\u7684\u79d8\u5bc6.md": "2025-05-14T03:59:29.070846",
   "blog/island-world/2025-6-1-\u5929\u5883\u4ecb\u7ecd.md": "2025-06-01T22:37:24.039725",
-  "blog/island-world/2025-6-1-\u7a7a\u5c9b\u5386\u4f53\u7cfb\u8bf4\u660e.md": "2025-09-12T20:38:31.376292",
+  "blog/island-world/2025-6-1-\u7a7a\u5c9b\u5386\u4f53\u7cfb\u8bf4\u660e.md": "2025-09-12T20:46:25.033193",
   "blog/island-world/2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a.md": "2025-09-12T20:26:30.992700",
   "blog/island-world/2025-9-12-\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd.md": "2025-09-12T20:42:17.326121",
   "blog/self-introduction/FavoriteAnimes.md": "2025-08-28T22:42:50.517352",
