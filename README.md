@@ -1,38 +1,36 @@
-这里是涟漪Rippin的个人网站！这里是需求文档
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-- [x] 设置section主页配色风格，使之符合section主题
-- [ ] 调整blog主页UI
-- [x] 调整section页面返回按钮
-- [x] 将blog调整为时间倒序
-- [x] 添加blog置顶功能
-- [ ] 添加多重tag检索功能
-- [ ] 添加特定tag的其他排序功能（倒序、正序排序，部分设定集需要逻辑排序）
-- [x] 进行移动端窄屏适配
-- [x] 主菜单左侧栏放置个人介绍（包括个人爱好游戏番剧什么的）
-- [ ] 设置section鼠标悬浮动画
-- [x] 修复主菜单重进时强制淡入淡出的问题
-- [x] 修复blog前有markdown语法且无题头时，简略栏出现原始markdown串的问题
-- [ ] 允许blog简略栏出现图片
-- [x] 设置blog弹窗时背景透明
-- [x] 点击blog弹窗外时关闭弹窗
-- [x] 重设blog字体
-- [ ] 给主菜单的section设计新的艺术字和选择特效
-- [x] 将展开全文按钮扩展到整个栏目
-- [ ] 编写后端，让blog更新可以在移动端上传
-- [x] 增加一个直接访问blog的url
-- [ ] 对blog栏目出一个翻页功能
-- [x] 在首页新增一个自动跟踪最新更新的blog的条目或者区域
-- [ ] 最新更新的blog的条目或者区域美化
-- [ ] 项目栏的左右横线放到整个文字框的两侧
-- [ ] ai绘图加入看板娘
-- [x] 夜间模式按钮
-- [ ] 将夜间模式适配到主界面
-- [ ] 鼠标样式和proj粒子效果
+## Getting Started
 
-长期计划：
-- [ ] 向网站引入向导ai
-- [ ] 加入项目规划进度面板
-- [ ] 加入工作使用的“和谐模式”
+First, run the development server:
 
-第二期计划：
-- [ ] 加入blog下载功能
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

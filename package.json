@@ -1,33 +1,31 @@
 {
-  "name": "void-island",
+  "name": "void-island-site",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint"
   },
   "dependencies": {
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
     "gray-matter": "^4.0.3",
-    "lucide-react": "^0.511.0",
-    "next": "15.3.2",
-    "react": "^19.0.0",
-    "react-cursorify": "^1.1.1287",
-    "react-dom": "^19.0.0",
-    "react-h5-audio-player": "^3.10.0-rc.1",
-    "react-jinke-music-player": "^4.24.2",
+    "lucide-react": "^0.544.0",
+    "next": "15.5.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
-    "react-syntax-highlighter": "^15.6.1",
-    "react-tsparticles": "^2.12.2",
+    "rehype-pretty-code": "^0.14.1",
     "rehype-raw": "^7.0.0",
-    "tsparticles": "^3.9.1"
+    "shiki": "^3.12.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
-    "eslint-config-next": "15.3.2",
+    "eslint-config-next": "15.5.3",
     "tailwindcss": "^4"
   }
 }
