@@ -1,5 +1,11 @@
 export const logs = [
   {
+    "title": "\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
+    "date": "2025-09-17 15:06:19",
+    "slug": "2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
+    "section": "ark"
+  },
+  {
     "title": "\u5982\u4f55\u4f4e\u6210\u672c\u83b7\u5f97gemini\u5b66\u751f\u8ba4\u8bc1.",
     "date": "2025-09-16 23:26:50",
     "slug": "2025-09-16-\u5982\u4f55\u4f4e\u6210\u672c\u83b7\u5f97gemini\u5b66\u751f\u8ba4\u8bc1",
@@ -22,17 +28,11 @@ export const logs = [
     "date": "2025-09-12 20:26:30",
     "slug": "2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
     "section": "island-world"
-  },
-  {
-    "title": "\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
-    "date": "2025-09-12 19:52:21",
-    "slug": "2025-7-22-\u4e50\u624d\u6d3e\u7f16\u66f2\u73ed\u5b66\u4e60\u7b14\u8bb0",
-    "section": "white-hall"
   }
 ];
 
 export const lastModified = {
-  "blog/ark/2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7.md": "2025-08-28T22:53:52.480022",
+  "blog/ark/2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7.md": "2025-09-17T15:06:19.755175",
   "blog/ark/2025-5-25-\u6f6e\u6c50\u5468\u671f\u8ba1\u5212.md": "2025-06-04T19:41:29.107058",
   "blog/cloud-leaf/2025-5-19-\u957f\u7ebfDDL\u4f5c\u6218\u8bb0\u5f55.md": "2025-05-21T01:05:30.036208",
   "blog/cloud-leaf/2025-5-27-\u7126\u8651\u8f6c\u5ac1\u7406\u8bba.md": "2025-06-10T11:36:08.188149",
