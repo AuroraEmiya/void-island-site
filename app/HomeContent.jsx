@@ -141,9 +141,19 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
       >
         {sectionsConfig.subProjects.map((project, idx) => (
           <div key={idx} style={{ color: project.color }}>
-            - {project.title}：{project.description} -
+            {project.ID ? (
+              <Link
+                href={`/project/${project.ID}`}
+                className="inline-block text-current hover:text-gray-100 underline cursor-pointer transition-colors duration-200"
+              >
+                - {project.title}：{project.description} -
+              </Link>
+            ) : (
+              <>- {project.title}：{project.description} -</>
+            )}
           </div>
         ))}
+
       </div>
 
       <div

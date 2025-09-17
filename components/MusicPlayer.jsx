@@ -138,7 +138,7 @@ const IconButton = ({ onClick, title, children, className }) => (
 
 function MusicPlayer() {
 	const [musicList, setMusicList] = useState([]);
-	const [currentIndex, setCurrentIndex] = useState(0);
+	const [currentIndex, setCurrentIndex] = useState(2);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
