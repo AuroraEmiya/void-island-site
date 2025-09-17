@@ -17,9 +17,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-markdown": "^10.1.0",
-    "rehype-pretty-code": "^0.14.1",
-    "rehype-raw": "^7.0.0",
-    "shiki": "^3.12.2"
+    "rehype-raw": "^7.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -1,89 +1,90 @@
 "use client";
 
-import { useCallback } from "react";
-import Particles from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
+import { useEffect, useRef } from "react";
 import ReturnMenus from "@/components/ReturnMenus";
 
-export default function ProjectItemPage({}) {
+// === 粒子效果的可自定义参数 ===
+const PARTICLE_COUNT = 150;
+const PARTICLE_COLOR = "#FFFFFF";
+const MIN_SPEED = 0.2;
+const MAX_SPEED = 1.0;
+const MIN_RADIUS = 0.5;
+const MAX_RADIUS = 2;
+// ==========================
 
-  // tsParticles 初始化函数，只在需要时加载引擎
-  const particlesInit = useCallback(async (engine) => {
-    // console.log(engine);
-    // 这里可以加载更多的形状或者预设，但我们为了最小化，只加载 slim 引擎
-    await loadSlim(engine);
-  }, []);
+export default function ProjectItemPage() {
+  const canvasRef = useRef(null);
 
-  // 粒子加载完成后的回调函数（可选）
-  const particlesLoaded = useCallback(async (container) => {
-    // await console.log(container);
+  // 这部分纯手写粒子的 JS 逻辑保持不变
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let particles = [];
+    let animationFrameId;
+
+    const setCanvasSize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const initParticles = () => {
+      particles = [];
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          speed: MIN_SPEED + Math.random() * (MAX_SPEED - MIN_SPEED),
+          radius: MIN_RADIUS + Math.random() * (MAX_RADIUS - MIN_RADIUS),
+        });
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.y -= p.speed;
+        if (p.y < 0) {
+          p.y = canvas.height;
+          p.x = Math.random() * canvas.width;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = PARTICLE_COLOR;
+        ctx.fill();
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    setCanvasSize();
+    initParticles();
+    animate();
+
+    const handleResize = () => {
+      setCanvasSize();
+      initParticles();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   return (
+    // 我们恢复使用您原来的 JSX 结构和 Tailwind 类名
     <main className="p-6 min-h-screen flex items-center justify-center text-white relative overflow-hidden">
-      {/* 背景层 1：上下渐变 + 流动 */}
+      {/* 背景层 1：您原来的渐变动画 div */}
       <div className="absolute inset-0 animate-gradient"></div>
 
-      {/* 背景层 2：粒子效果 */}
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        loaded={particlesLoaded}
+      {/* 背景层 2：我们的纯手写粒子画布 */}
+      <canvas
+        ref={canvasRef}
         className="absolute inset-0 z-0"
-        options={{
-          // --- 从这里开始替换 ---
-          background: {
-            color: {
-              value: "transparent",
-            },
-          },
-          fpsLimit: 120,
-          particles: {
-            color: {
-              value: "#ffffff", // 粒子颜色
-            },
-            // 移除了粒子连接线，使效果更干净、更像星空或数据点
-            links: {
-              enable: false,
-            },
-            move: {
-              direction: "top", // 粒子全部向上移动
-              enable: true,
-              outModes: {
-                default: "out", // 粒子移出画布后会从底部重新出现
-              },
-              random: false,
-              speed: 1.5, // 速度可以稍微调整
-              straight: true, // 粒子直线移动
-            },
-            number: {
-              density: {
-                enable: true,
-                area: 800,
-              },
-              value: 160, // 增加了粒子数量，使其更密集
-            },
-            opacity: {
-              value: { min: 0.3, max: 0.8 }, // 透明度随机，营造闪烁感
-            },
-            shape: {
-              type: "circle", // 仍然用圆形，模仿星点或数据点
-            },
-            size: {
-              value: { min: 0.5, max: 2 }, // 粒子大小随机，有远近感
-            },
-            // 新增闪烁效果
-            twinkle: {
-              particles: {
-                enable: true,
-                frequency: 0.05,
-                opacity: 1,
-              },
-            },
-          },
-          detectRetina: true,
-          // --- 到这里结束替换 ---
-        }}
       />
 
       {/* 内容层 */}
@@ -92,6 +93,7 @@ export default function ProjectItemPage({}) {
         <h1 className="text-4xl font-bold">项目主页未建立</h1>
       </div>
 
+      {/* 这里是我们继承过来的、您原来的渐变背景波浪逻辑 */}
       <style jsx>{`
         @keyframes gradientFlow {
           0% {
@@ -107,8 +109,8 @@ export default function ProjectItemPage({}) {
         .animate-gradient {
           background: linear-gradient(
             140deg,
-            #D85D5D 0%, /* 上粉色 (lightpink) */
-            #3A325A 100% /* 下紫色 (blueviolet) */
+            #D85D5D 0%,
+            #3A325A 100%
           );
           background-size: 200% 200%;
           animation: gradientFlow 12s ease infinite;
