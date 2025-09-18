@@ -107,10 +107,9 @@ export default function MainProjectPage({ projects }) {
 
       {/* 内容层 */}
       <div
-        className="relative z-10 flex flex-col items-center w-full"
+        className="relative z-10 md:px-10 flex flex-col items-center w-full"
         style={{
           maxWidth: "1200px",
-          padding: "40px",
         }}
       >
         <ReturnMenus />
