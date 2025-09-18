@@ -84,7 +84,7 @@ export default function MainProjectPage({ projects }) {
 
   return (
     // 我们不再在 main 元素上添加 dark-mode 类
-    <main className="p-6 min-h-screen flex items-center justify-center text-white relative overflow-hidden">
+    <main className="p-6 min-h-screen flex items-center text-white relative">
       
       {/* 1. 背景层容器 */}
       <div className="absolute inset-0 z-[-1]"> {/* 将背景整体置于最底层 */}
@@ -107,15 +107,14 @@ export default function MainProjectPage({ projects }) {
 
       {/* 内容层 */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center w-full"
+        className="relative z-10 flex flex-col items-center w-full"
         style={{
           maxWidth: "1200px",
-          margin: "0 auto",
           padding: "40px",
         }}
       >
         <ReturnMenus />
-        <ProjectContent title="" content={projectDescription} />
+        <ProjectContent content={projectDescription} />
       </div>
 
       {/* 2. 更新 style 块，为两个独立的背景层定义样式 */}
@@ -132,17 +131,20 @@ export default function MainProjectPage({ projects }) {
           }
         }
         
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradientFlow 12s ease infinite;
-        }
+        /* 移除 .animate-gradient 的定义，因为它不再需要 */
 
         .day-gradient {
           background: linear-gradient(140deg, #d85d5d 0%, #3a325a 100%);
+          /* VVV 将动画属性移动到这里 VVV */
+          background-size: 200% 200%;
+          animation: gradientFlow 12s ease infinite;
         }
         
         .night-gradient {
           background: linear-gradient(140deg, #0b192f 0%, #020c1b 100%);
+          /* VVV 动画属性也需要加到这里 VVV */
+          background-size: 200% 200%;
+          animation: gradientFlow 12s ease infinite;
         }
       `}</style>
     </main>
