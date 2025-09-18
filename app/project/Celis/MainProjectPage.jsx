@@ -84,10 +84,10 @@ export default function MainProjectPage({ projects }) {
 
   return (
     // 我们不再在 main 元素上添加 dark-mode 类
-    <main className="p-6 min-h-screen flex items-center text-white relative">
+    <main className="md:p-6 min-h-screen flex items-center text-white relative">
       
       {/* 1. 背景层容器 */}
-      <div className="absolute inset-0 z-[-1]"> {/* 将背景整体置于最底层 */}
+      <div className="fixed inset-0 z-[-1]"> {/* 将背景整体置于最底层 */}
         {/* 日间模式背景 */}
         <div
           className="day-gradient absolute inset-0 animate-gradient"
@@ -103,7 +103,7 @@ export default function MainProjectPage({ projects }) {
 
       {/* 粒子画布 */}
       {/* 确保 z-index 比背景高，比内容低 */}
-      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+      <canvas ref={canvasRef} className="fixed inset-0 z-0" />
 
       {/* 内容层 */}
       <div
@@ -121,13 +121,13 @@ export default function MainProjectPage({ projects }) {
       <style jsx>{`
         @keyframes gradientFlow {
           0% {
-            background-position: 20% 20%;
+            background-position: 10% 10%;
           }
           50% {
             background-position: 80% 80%;
           }
           100% {
-            background-position: 20% 20%;
+            background-position: 10% 10%;
           }
         }
         
@@ -137,14 +137,14 @@ export default function MainProjectPage({ projects }) {
           background: linear-gradient(140deg, #d85d5d 0%, #3a325a 100%);
           /* VVV 将动画属性移动到这里 VVV */
           background-size: 200% 200%;
-          animation: gradientFlow 12s ease infinite;
+          animation: gradientFlow 15s ease infinite;
         }
         
         .night-gradient {
           background: linear-gradient(140deg, #0b192f 0%, #020c1b 100%);
           /* VVV 动画属性也需要加到这里 VVV */
           background-size: 200% 200%;
-          animation: gradientFlow 12s ease infinite;
+          animation: gradientFlow 15s ease infinite;
         }
       `}</style>
     </main>
