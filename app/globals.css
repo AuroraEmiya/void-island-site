@@ -69,10 +69,7 @@ body {
   font-family: 'OPPOSANS', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #ffecd2, #a1c4fd);
-  /* 橙-蓝柔和渐变 */
   min-height: 100vh;
-  color: #fff;
 }
 
 @media (max-width: 768px) {

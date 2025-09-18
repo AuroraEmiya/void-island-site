@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { useTheme } from "@/lib/theme";
 
-export default function BlogModal({ title, excerpt, content, onClose, isMobile }) {
+export default function BlogModal({ title, excerpt, content, onClose, isMobile, forceTheme = null }) {
   const modalRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [markdown, setMarkdown] = useState(content || "");
@@ -19,7 +19,9 @@ export default function BlogModal({ title, excerpt, content, onClose, isMobile }
 
   // 解决手机浏览器出现顶部导航栏时，100vh不受影响，引起的跳变问题
   const [height, setHeight] = useState(0);
-  const { isDarkMode } = useTheme();
+  const { isDarkMode: globalIsDarkMode } = useTheme();
+  const isDarkMode = forceTheme !== null ? forceTheme : globalIsDarkMode;
+
   useEffect(() => {
     const updateHeight = () => {
       const fullHeight = window.innerHeight;

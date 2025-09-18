@@ -24,10 +24,8 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
   };
 
   const didMount = useRef(false);
-  // 初始设为空数组，避免初始渲染动画
   const [animatedTitles, setAnimatedTitles] = useState([]);
 
-  
   useEffect(() => {
     function handleResize() {
       setIsMobile(window.innerWidth <= 768);
@@ -37,7 +35,6 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 监听路由变化，路径是首页时重置didMount，避免返回时触发动画
   useEffect(() => {
     if (pathname === "/") {
       didMount.current = false;
@@ -52,13 +49,11 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
     }));
 
     if (!didMount.current) {
-      // 首次加载，直接设置 visible，跳过动画
       setAnimatedTitles(newTitles.map((item) => ({ ...item, visible: true })));
       didMount.current = true;
       return;
     }
 
-    // 后续切换，先隐藏再渐显动画
     setAnimatedTitles((prev) =>
       prev.map((item) => ({ ...item, visible: false }))
     );
@@ -73,152 +68,173 @@ export default function HomeContent({ selfIntroPosts, headlinePosts }) {
   const selectedPost = selfIntroPosts.find((p) => p.slug === modalSlug);
 
   return (
-    <main
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        paddingTop: "100px",
-        paddingBottom: isMobile ? "80px" : "0px",
-      }}
-    >
-+     {modalSlug && selectedPost && (
-        <BlogModal
-          title={selectedPost.title}
-          excerpt={selectedPost.excerpt}
-          content={selectedPost.content}
-          onClose={closeModal}
-          isMobile={isMobile}
-        />
-      )}
-      <TopRightButton isMobile={isMobile} />
-
-      <SelfIntroduction
-        isMobile={isMobile}
-        sectionsConfig={sectionsConfig}
-        openModal={openModal}
+    <div className="min-h-screen relative overflow-hidden text-white">
+      {/* 背景层 1 (原 filterOn=true 时的背景) */}
+      <div
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{
+          background: "linear-gradient(135deg,rgb(151, 139, 123),rgb(79, 97, 125))",
+          opacity: filterOn ? 1 : 0,
+          zIndex: 0,
+        }}
+      />
+      {/* 背景层 2 (原 filterOn=false 时的背景) */}
+      <div
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{
+          background: "linear-gradient(135deg,rgb(249, 235, 215),rgb(175, 205, 254))",
+          opacity: filterOn ? 0 : 1,
+          zIndex: 0,
+        }}
       />
 
-      <div
+      {/* 内容层，确保在背景之上 */}
+      <main
+        className="relative z-10"
         style={{
-          paddingTop: isMobile ? "15px" : "0px", //手机端顶部留出阴影空隙
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          textAlign: "center",
-          fontSize: "2.5rem",
-          fontWeight: "bold",
-          textShadow: "2px 2px 5px #000",
-          marginBottom: "2rem",
+          paddingTop: "100px",
+          paddingBottom: isMobile ? "80px" : "0px",
         }}
       >
-        {animatedTitles.map((item, idx) => (
-          <div
-            key={idx}
-            style={{
-              color: item.color,
-              opacity: item.visible ? 1 : 0,
-              transform: item.visible ? "translateX(0)" : "translateX(20px)",
-              transition: "all 0.3s ease-in-out",
-            }}
-          >
-            <Link href={item.link}>{item.text}</Link>
-          </div>
-        ))}
-      </div>
+        {modalSlug && selectedPost && (
+          <BlogModal
+            title={selectedPost.title}
+            excerpt={selectedPost.excerpt}
+            content={selectedPost.content}
+            onClose={closeModal}
+            isMobile={isMobile}
+            forceTheme={filterOn}
+          />
+        )}
+        <TopRightButton isMobile={isMobile} />
 
-      <div
-        style={{
-          fontSize: "1rem",
-          textAlign: "center",
-          lineHeight: "1.8",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          padding: "20px",
-          borderRadius: "10px",
-          fontWeight: "bold",
-          maxWidth: "600px",
-        }}
-      >
-        {sectionsConfig.subProjects.map((project, idx) => (
-          <div key={idx} style={{ color: project.color }}>
-            {project.ID ? (
-              <Link
-                href={`/project/${project.ID}`}
-                className="inline-block text-current hover:text-gray-100 underline cursor-pointer transition-colors duration-200"
-              >
-                - {project.title}：{project.description} -
-              </Link>
-            ) : (
-              <>- {project.title}：{project.description} -</>
-            )}
-          </div>
-        ))}
+        <SelfIntroduction
+          isMobile={isMobile}
+          sectionsConfig={sectionsConfig}
+          openModal={openModal}
+        />
 
-      </div>
-
-      <div
-        style={{
-          position: isMobile ? "static" : "fixed",
-          bottom: isMobile ? "auto" : "20px",
-          right: isMobile ? "auto" : "20px",
-          backgroundColor: "rgba(100, 100, 100, 0.9)",
-          color: "white",
-          padding: "15px 20px",
-          borderRadius: "10px",
-          border: "3px solid white",
-          fontWeight: "bold",
-          maxWidth: "300px",
-          zIndex: 2,
-          wordWrap: "break-word",
-          textAlign: "center",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-        }}
-        className="headline-box"
-      >
-        <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <h1 style={{ whiteSpace: "pre-line", fontSize: "1.5em" }}>
-            系统公告📢
-          </h1>
-          <h1 style={{ whiteSpace: "pre-line" }}>
-            {sectionsConfig.headline.description}
-          </h1>
-        </div>
         <div
-          style={{ textAlign: "center", marginBottom: "20px", fontSize: "1.5em" }}
+          style={{
+            paddingTop: isMobile ? "15px" : "0px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            fontSize: "2.5rem",
+            fontWeight: "bold",
+            textShadow: "2px 2px 5px #000",
+            marginBottom: "2rem",
+          }}
         >
-        <h1>实时更新⌚</h1>
-        </div>
-        {headlinePosts.map((post, index) => (
-          <div key={index} style={{ marginBottom: "10px", textAlign: "left" }}>
-            <div style={{ fontSize: "0.85em", opacity: 0.85 }}>
-              {post.date}｜{post.section}
+          {animatedTitles.map((item, idx) => (
+            <div
+              key={idx}
+              style={{
+                color: item.color,
+                opacity: item.visible ? 1 : 0,
+                transform: item.visible ? "translateX(0)" : "translateX(20px)",
+                transition: "all 0.3s ease-in-out",
+              }}
+            >
+              <Link href={item.link}>{item.text}</Link>
             </div>
-            <div style={{ fontSize: "1em" }}>
-              {post.section === "self-introduction" ? (
-                // 个人介绍文章走主页弹窗逻辑
-                <a
-                  href={`/?post=${post.slug}`}
-                  onClick={(e) => {
-                    e.preventDefault();       // 阻止默认跳转
-                    openModal(post.slug);     // 调用主页弹窗方法
-                  }}
-                  style={{ color: "#fff", textDecoration: "underline" }}
+          ))}
+        </div>
+
+        <div
+          style={{
+            fontSize: "1rem",
+            textAlign: "center",
+            lineHeight: "1.8",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            padding: "20px",
+            borderRadius: "10px",
+            fontWeight: "bold",
+            maxWidth: "600px",
+          }}
+        >
+          {sectionsConfig.subProjects.map((project, idx) => (
+            <div key={idx} style={{ color: project.color }}>
+              {project.ID ? (
+                <Link
+                  href={`/project/${project.ID}`}
+                  className="inline-block text-current hover:text-gray-100 underline cursor-pointer transition-colors duration-200"
                 >
-                  {post.title}
-                </a>
+                  - {project.title}：{project.description} -
+                </Link>
               ) : (
-                // 其他文章保持原有逻辑
-                <a
-                  href={`/blog/${post.section}?post=${post.slug}`}
-                  style={{ color: "#fff", textDecoration: "underline" }}
-                >
-                  {post.title}
-                </a>
+                <>- {project.title}：{project.description} -</>
               )}
             </div>
+          ))}
+        </div>
+
+        <div
+          style={{
+            position: isMobile ? "static" : "fixed",
+            bottom: isMobile ? "auto" : "20px",
+            right: isMobile ? "auto" : "20px",
+            backgroundColor: "rgba(100, 100, 100, 0.9)",
+            color: "white",
+            padding: "15px 20px",
+            borderRadius: "10px",
+            border: "3px solid white",
+            fontWeight: "bold",
+            maxWidth: "300px",
+            zIndex: 2,
+            wordWrap: "break-word",
+            textAlign: "center",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+          }}
+          className="headline-box"
+        >
+          <div style={{ textAlign: "center", marginBottom: "20px" }}>
+            <h1 style={{ whiteSpace: "pre-line", fontSize: "1.5em" }}>
+              系统公告📢
+            </h1>
+            <h1 style={{ whiteSpace: "pre-line" }}>
+              {sectionsConfig.headline.description}
+            </h1>
           </div>
-        ))}
-      </div>
-    </main>
+          <div
+            style={{ textAlign: "center", marginBottom: "20px", fontSize: "1.5em" }}
+          >
+            <h1>实时更新⌚</h1>
+          </div>
+          {headlinePosts.map((post, index) => (
+            <div key={index} style={{ marginBottom: "10px", textAlign: "left" }}>
+              <div style={{ fontSize: "0.85em", opacity: 0.85 }}>
+                {post.date}｜{post.section}
+              </div>
+              <div style={{ fontSize: "1em" }}>
+                {post.section === "self-introduction" ? (
+                  <a
+                    href={`/?post=${post.slug}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openModal(post.slug);
+                    }}
+                    style={{ color: "#fff", textDecoration: "underline" }}
+                  >
+                    {post.title}
+                  </a>
+                ) : (
+                  <a
+                    href={`/blog/${post.section}?post=${post.slug}`}
+                    style={{ color: "#fff", textDecoration: "underline" }}
+                  >
+                    {post.title}
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
   );
 }

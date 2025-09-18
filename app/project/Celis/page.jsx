@@ -1,6 +1,8 @@
-import MainSectionPage from "./MainSectionPage";
+import MainProjectPage from "./MainProjectPage";
+import { getProjectByID } from "@/lib/projects";
 
-export default async function ProjectPage({ params }) {
+export default async function ProjectPage() {
+  const projects = getProjectByID("Celis");
 
-	return <MainSectionPage/>;
+  return <MainProjectPage projects={projects} />;
 }
