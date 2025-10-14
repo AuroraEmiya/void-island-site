@@ -1,5 +1,23 @@
 export const logs = [
   {
+    "title": "\u8702\u9e1f\u4e0e\u82b1\u6d77\u7684\u5b88\u671b\u2014\u2014\u767e\u56e2\u5927\u6218\u7eaa\u5b9e",
+    "date": "2025-10-15 00:15:23",
+    "slug": "2025-10-15-\u767e\u56e2\u5927\u6218\u7eaa\u5b9e",
+    "section": "cloud-leaf"
+  },
+  {
+    "title": "\u559c\u6b22\u7684\u6e38\u620f\u5217\u8868",
+    "date": "2025-10-15 00:05:13",
+    "slug": "FavoriteGames",
+    "section": "self-introduction"
+  },
+  {
+    "title": "\u559c\u6b22\u7684\u756a\u5267\u5217\u8868",
+    "date": "2025-10-15 00:03:29",
+    "slug": "FavoriteAnimes",
+    "section": "self-introduction"
+  },
+  {
     "title": "\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
     "date": "2025-09-18 12:31:49",
     "slug": "2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
@@ -10,30 +28,13 @@ export const logs = [
     "date": "2025-09-18 01:17:01",
     "slug": "2025-9-18-\u5f88\u4e0d\u723d\u7684\u4e00\u6b21debug",
     "section": "cloud-leaf"
-  },
-  {
-    "title": "\u5982\u4f55\u4f4e\u6210\u672c\u83b7\u5f97gemini\u5b66\u751f\u8ba4\u8bc1.",
-    "date": "2025-09-18 00:13:01",
-    "slug": "2025-09-16-\u5982\u4f55\u4f4e\u6210\u672c\u83b7\u5f97gemini\u5b66\u751f\u8ba4\u8bc1",
-    "section": "white-hall"
-  },
-  {
-    "title": "\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd\uff08\u8bbe\u5b9a\u8865\u5145\u4e2d...\uff09",
-    "date": "2025-09-18 00:13:01",
-    "slug": "2025-9-12-\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd",
-    "section": "island-world"
-  },
-  {
-    "title": "\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
-    "date": "2025-09-18 00:13:01",
-    "slug": "2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a",
-    "section": "island-world"
   }
 ];
 
 export const lastModified = {
   "blog/ark/2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7.md": "2025-09-18T12:31:49.823764",
   "blog/ark/2025-5-25-\u6f6e\u6c50\u5468\u671f\u8ba1\u5212.md": "2025-09-18T00:13:01.323846",
+  "blog/cloud-leaf/2025-10-15-\u767e\u56e2\u5927\u6218\u7eaa\u5b9e.md": "2025-10-15T00:15:23.768516",
   "blog/cloud-leaf/2025-5-19-\u957f\u7ebfDDL\u4f5c\u6218\u8bb0\u5f55.md": "2025-09-18T00:13:01.324847",
   "blog/cloud-leaf/2025-5-27-\u7126\u8651\u8f6c\u5ac1\u7406\u8bba.md": "2025-09-18T00:13:01.325346",
   "blog/cloud-leaf/2025-5-29-\u4fdd\u5e9510\u8fde4\u4e2a\u4e09\u706f\u6709\u6ca1\u6709\u61c2\u7684.md": "2025-09-18T00:13:01.325858",
@@ -48,8 +49,8 @@ export const lastModified = {
   "blog/island-world/2025-6-1-\u7a7a\u5c9b\u5386\u4f53\u7cfb\u8bf4\u660e.md": "2025-09-18T00:13:01.329848",
   "blog/island-world/2025-7-30-\u7a7a\u5c9b\u98de\u884c\u7269\u7ba1\u7406\u901a\u544a.md": "2025-09-18T00:13:01.330857",
   "blog/island-world/2025-9-12-\u8702\u5de2\u4e16\u754c\u4ecb\u7ecd.md": "2025-09-18T00:13:01.331345",
-  "blog/self-introduction/FavoriteAnimes.md": "2025-09-18T00:13:01.331845",
-  "blog/self-introduction/FavoriteGames.md": "2025-09-18T00:13:01.332360",
+  "blog/self-introduction/FavoriteAnimes.md": "2025-10-15T00:03:29.548404",
+  "blog/self-introduction/FavoriteGames.md": "2025-10-15T00:05:13.434777",
   "blog/self-introduction/Targets.md": "2025-09-18T00:13:01.332844",
   "blog/star-dream/2025-5-11-\u81ea\u7531\u7684\u610f\u4e49.md": "2025-09-18T00:13:01.333345",
   "blog/star-dream/2025-5-14-\u68a6\u65e5\u8bb0.md": "2025-09-18T00:13:01.333846",
