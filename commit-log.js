@@ -1,5 +1,11 @@
 export const logs = [
   {
+    "title": "\u6709\u610f\u4e49\u548c\u65e0\u610f\u4e49\u7684\u4e8b\u60c5",
+    "date": "2025-10-17 19:53:02",
+    "slug": "2025-10-17-\u6709\u610f\u4e49\u548c\u65e0\u610f\u4e49\u7684\u4e8b\u60c5",
+    "section": "star-dream"
+  },
+  {
     "title": "\u8702\u9e1f\u4e0e\u82b1\u6d77\u7684\u5b88\u671b\u2014\u2014\u767e\u56e2\u5927\u6218\u7eaa\u5b9e",
     "date": "2025-10-15 00:15:23",
     "slug": "2025-10-15-\u767e\u56e2\u5927\u6218\u7eaa\u5b9e",
@@ -22,12 +28,6 @@ export const logs = [
     "date": "2025-09-18 12:31:49",
     "slug": "2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
     "section": "ark"
-  },
-  {
-    "title": "\u5f88\u4e0d\u723d\u7684\u4e00\u6b21debug",
-    "date": "2025-09-18 01:17:01",
-    "slug": "2025-9-18-\u5f88\u4e0d\u723d\u7684\u4e00\u6b21debug",
-    "section": "cloud-leaf"
   }
 ];
 
@@ -52,6 +52,7 @@ export const lastModified = {
   "blog/self-introduction/FavoriteAnimes.md": "2025-10-15T00:03:29.548404",
   "blog/self-introduction/FavoriteGames.md": "2025-10-15T00:05:13.434777",
   "blog/self-introduction/Targets.md": "2025-09-18T00:13:01.332844",
+  "blog/star-dream/2025-10-17-\u6709\u610f\u4e49\u548c\u65e0\u610f\u4e49\u7684\u4e8b\u60c5.md": "2025-10-17T19:53:02.331346",
   "blog/star-dream/2025-5-11-\u81ea\u7531\u7684\u610f\u4e49.md": "2025-09-18T00:13:01.333345",
   "blog/star-dream/2025-5-14-\u68a6\u65e5\u8bb0.md": "2025-09-18T00:13:01.333846",
   "blog/star-dream/2025-5-16-\u68a6\u65e5\u8bb0.md": "2025-09-18T00:13:01.334346",
