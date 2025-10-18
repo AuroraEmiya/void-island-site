@@ -1,8 +1,8 @@
 import os
 import json
 import codecs
-from datetime import datetime
-
+from datetime import datetime, timezone, timedelta
+BEIJING_TZ = timezone(timedelta(hours=8))
 commit_log_file = "commit-log.txt"
 commit_log_js_file = "commit-log.js"
 
