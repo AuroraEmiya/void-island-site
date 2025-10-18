@@ -1,5 +1,11 @@
 export const logs = [
   {
+    "title": "\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
+    "date": "2025-10-18 14:37:16",
+    "slug": "2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7",
+    "section": "ark"
+  },
+  {
     "title": "\u670d\u52a1\u5668\u7f51\u7ad9\u6302\u8f7d\u82b1\u8d39",
     "date": "2025-10-17 21:49:58",
     "slug": "2025-10-17-\u670d\u52a1\u5668\u7f51\u7ad9\u6302\u8f7d\u82b1\u8d39",
@@ -22,17 +28,11 @@ export const logs = [
     "date": "2025-10-15 00:05:13",
     "slug": "FavoriteGames",
     "section": "self-introduction"
-  },
-  {
-    "title": "\u559c\u6b22\u7684\u756a\u5267\u5217\u8868",
-    "date": "2025-10-15 00:03:29",
-    "slug": "FavoriteAnimes",
-    "section": "self-introduction"
   }
 ];
 
 export const lastModified = {
-  "blog/ark/2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7.md": "2025-09-18T12:31:49.823764",
+  "blog/ark/2025-5-12-\u7f51\u7ad9\u914d\u7f6e\u66f4\u65b0\u65e5\u5fd7.md": "2025-10-18T14:37:16.049299",
   "blog/ark/2025-5-25-\u6f6e\u6c50\u5468\u671f\u8ba1\u5212.md": "2025-09-18T00:13:01.323846",
   "blog/cloud-leaf/2025-10-15-\u767e\u56e2\u5927\u6218\u7eaa\u5b9e.md": "2025-10-15T00:15:23.768516",
   "blog/cloud-leaf/2025-10-17-\u670d\u52a1\u5668\u7f51\u7ad9\u6302\u8f7d\u82b1\u8d39.md": "2025-10-17T21:49:58.301108",
