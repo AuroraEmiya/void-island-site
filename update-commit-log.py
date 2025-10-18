@@ -71,7 +71,7 @@ def get_blog_metadata(latest_logs):
         if metadata:
             title = metadata.get("title", "No title")
             timestamp = log['timestamp']
-            date = datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+            date = datetime.fromtimestamp(timestamp, tz=BEIJING_TZ).strftime("%Y-%m-%d %H:%M:%S")
             slug = os.path.splitext(os.path.basename(decoded_path))[0]
 
             parts = decoded_path.replace("\\", "/").split("/")
@@ -97,7 +97,7 @@ def get_all_blog_last_modified():
             if file.endswith(".md"):
                 full_path = os.path.join(root, file)
                 timestamp = os.path.getmtime(full_path)
-                iso_time = datetime.fromtimestamp(timestamp).isoformat()
+                iso_time = datetime.fromtimestamp(timestamp, tz=BEIJING_TZ).isoformat()
                 rel_path = os.path.relpath(full_path).replace("\\", "/")
                 last_modified_map[rel_path] = iso_time
     return last_modified_map
