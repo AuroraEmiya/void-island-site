@@ -66,13 +66,18 @@ export default function AetherClient({ isDarkOverride }) {
     socketInstance.on("auth-none", () => { setUser(null); setAuthChecked(true); });
     socketInstance.on("op-feedback", (fb) => showToast(fb.message, fb.type));
     socketInstance.on("new-account-created", (info) => setNewAccountInfo(info));
-    socketInstance.on("update-success", ({ field, value }) => {
-      if (field === "username") { fieldName = "昵称"; }
-      else if (field === "profile") { fieldName = "个人资料"; }
-      else if (field === "currentAvatar") { fieldName = "头像"; }
-      fieldName = field;
-      // const fieldName = field === "username" ? "昵称" : "个人资料";
-      showToast(`${fieldName}修改成功`); // 补回成功提示
+      socketInstance.on("update-success", ({ field, value }) => {let fieldLabel = ""; 
+        if (field === "username") { 
+          fieldLabel = "昵称"; 
+        } else if (field === "profile") { 
+          fieldLabel = "个人资料"; 
+        } else if (field === "currentAvatar") { 
+          fieldLabel = "头像"; 
+        } else {
+          fieldLabel = field; 
+        }
+
+      showToast(`${fieldLabel}修改成功`);
       if (field === "profile") { 
         setUser(prev => ({ ...prev, profile: value })); 
         setProfileInput(value);
