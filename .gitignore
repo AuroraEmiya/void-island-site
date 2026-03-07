@@ -42,3 +42,8 @@ next-env.d.ts
 
 commit-log.js
 commit-log.txt
+
+# SQLite 数据库文件
+database.db
+database.db-shm
+database.db-wal

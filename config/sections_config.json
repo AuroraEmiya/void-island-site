@@ -89,8 +89,8 @@
     {
       "title": "天境列车",
       "color": "silver",
-      "description": "尚未到站，第一班列车将于3个潮汐周期后到达",
-      "ID": ""
+      "description": "尚未到站，第一班列车将于1个潮汐周期后到达",
+      "ID": "Aether"
     },
     {
       "title": "星伞计划",
