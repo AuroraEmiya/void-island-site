@@ -25,6 +25,33 @@ db.exec(`
   );
 `);
 
+const adminExists = db.prepare("SELECT id FROM users WHERE uuid_login = ?").get("1");
+if (!adminExists) {
+  const foreverDate = "2099-12-31T23:59:59.000Z";
+  db.prepare(`
+    INSERT INTO users (
+      uuid_login, 
+      username, 
+      password_hash, 
+      role, 
+      profile, 
+      current_avatar, 
+      unlocked_avatars,
+      expired_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    "1",                     // UUID
+    "萤草",                   // 昵称
+    "admin",                  // 密码
+    "admin",                  // 角色
+    "天境列车首席管理员。",      // 简介
+    "YingCao",                // 默认头像
+    JSON.stringify(["default", "YingCao"]), // 可选头像列表
+    foreverDate                               // expired_at
+  );
+  console.log("[Database] 管理员账户 '萤草' 初始化烧录成功");
+}
+
 // 辅助函数：生成不重复的9位数字ID
 function generateShortId() {
   while (true) {
@@ -41,13 +68,27 @@ function generateRandomPwd() {
 
 let globalState = {
   switches: { light1: false, light2: false },
-  onlineCount: 0
+  onlineUsers: {} // 存储格式：{ socketId: { username: '...', avatar: '...' } }
 };
+
+// 辅助函数：广播最新在线列表
+function broadcastOnlineList(io) {
+  const list = Object.values(globalState.onlineUsers);
+  io.emit("update-online-list", {
+    count: list.length,
+    users: list
+  });
+}
 
 module.exports = function(io) {
   io.on("connection", (socket) => {
-    globalState.onlineCount++;
-    io.emit("update-online-count", globalState.onlineCount);
+    // 初始标记为访客
+    globalState.onlineUsers[socket.id] = { 
+      username: "未登录访客", 
+      avatar: "default",
+      isGuest: true 
+    };
+    broadcastOnlineList(io);
 
     socket.on("auth-request", ({ sessionId, createNewGuest, loginData }) => {
       let user = null;
@@ -102,8 +143,16 @@ module.exports = function(io) {
           sessionId: user.session_id,
           profile: user.profile,
           currentAvatar: user.current_avatar,
+          unlockedAvatars: JSON.parse(user.unlocked_avatars),
           expiredAt: user.expired_at
         });
+        // ✅ 新增：更新在线列表中的身份信息
+        globalState.onlineUsers[socket.id] = {
+          username: user.username,
+          avatar: user.current_avatar,
+          isGuest: false
+        };
+        broadcastOnlineList(io);
         socket.emit("op-feedback", { type: 'success', message: '登录成功' });
       } else {
         socket.emit("auth-none");
@@ -113,6 +162,9 @@ module.exports = function(io) {
     socket.on("logout", (sessionId) => {
       if (sessionId) {
         db.prepare("DELETE FROM sessions WHERE session_id = ?").run(sessionId);
+        // ✅ 新增：恢复为访客身份
+        globalState.onlineUsers[socket.id] = { username: "未登录访客", avatar: "default", isGuest: true };
+        broadcastOnlineList(io);
         socket.emit("logout-confirm");
         socket.emit("op-feedback", { type: 'success', message: '已安全退出' });
       }
@@ -134,9 +186,25 @@ module.exports = function(io) {
         try {
           db.prepare("UPDATE users SET username = ? WHERE id = ?").run(trimmedName, session.user_id);
           socket.emit("update-success", { field: "username", value: trimmedName });
+          globalState.onlineUsers[socket.id].username = trimmedName; // ✅ 更新在线昵称
+          broadcastOnlineList(io);
         } catch (e) {
           socket.emit("op-feedback", { type: 'error', message: '该昵称已被占用' });
         }
+      }
+      if (field === "currentAvatar") {
+        // 先检查该用户是否拥有这个头像（安全校验）
+        const userRow = db.prepare("SELECT unlocked_avatars FROM users WHERE id = ?").get(session.user_id);
+        const unlocked = JSON.parse(userRow.unlocked_avatars);
+        
+        if (!unlocked.includes(value)) {
+          return socket.emit("op-feedback", { type: 'error', message: '尚未获得该头像' });
+        }
+
+        db.prepare("UPDATE users SET current_avatar = ? WHERE id = ?").run(value, session.user_id);
+        socket.emit("update-success", { field: "currentAvatar", value: value });
+        globalState.onlineUsers[socket.id].avatar = value; // ✅ 更新在线头像
+        broadcastOnlineList(io);
       }
     });
     // 状态测试逻辑保持不变...
@@ -149,8 +217,8 @@ module.exports = function(io) {
     });
 
     socket.on("disconnect", () => {
-      globalState.onlineCount--;
-      io.emit("update-online-count", globalState.onlineCount);
+      delete globalState.onlineUsers[socket.id];
+      broadcastOnlineList(io);
     });
   });
 };

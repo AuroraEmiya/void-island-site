@@ -10,6 +10,7 @@ import { useTheme } from "@/lib/theme";
 export default function AetherClient({ isDarkOverride }) {
   const [socket, setSocket] = useState(null);
   const [onlineCount, setOnlineCount] = useState(0);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [switches, setSwitches] = useState({ light1: false, light2: false });
   const { isDarkMode } = useTheme();
   // 用户状态
@@ -26,6 +27,7 @@ export default function AetherClient({ isDarkOverride }) {
   const [loginForm, setLoginForm] = useState({ uuid: "", password: "" });
   const [newAccountInfo, setNewAccountInfo] = useState(null); 
   const [toast, setToast] = useState(null);
+  const [showAvatarModal, setShowAvatarModal] = useState(false); // 控制头像弹窗
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -65,7 +67,11 @@ export default function AetherClient({ isDarkOverride }) {
     socketInstance.on("op-feedback", (fb) => showToast(fb.message, fb.type));
     socketInstance.on("new-account-created", (info) => setNewAccountInfo(info));
     socketInstance.on("update-success", ({ field, value }) => {
-      const fieldName = field === "username" ? "昵称" : "个人资料";
+      if (field === "username") { fieldName = "昵称"; }
+      else if (field === "profile") { fieldName = "个人资料"; }
+      else if (field === "currentAvatar") { fieldName = "头像"; }
+      fieldName = field;
+      // const fieldName = field === "username" ? "昵称" : "个人资料";
       showToast(`${fieldName}修改成功`); // 补回成功提示
       if (field === "profile") { 
         setUser(prev => ({ ...prev, profile: value })); 
@@ -77,10 +83,18 @@ export default function AetherClient({ isDarkOverride }) {
         setNameInput(value);
         setIsEditingName(false); 
       }
+      if (field === "currentAvatar") {
+        setUser(prev => ({ ...prev, currentAvatar: value }));
+        showToast("头像更换成功");
+        setShowAvatarModal(false);
+      }
     });
     socketInstance.on("logout-confirm", () => { localStorage.removeItem("AETHER_SESSION_ID"); setUser(null); });
     socketInstance.on("init-state", (data) => setSwitches(data));
-    socketInstance.on("update-online-count", (count) => setOnlineCount(count));
+    socketInstance.on("update-online-list", (data) => {
+      setOnlineCount(data.count);
+      setOnlineUsers(data.users);
+    });
     socketInstance.on("state-changed", (data) => setSwitches(data));
 
     return () => socketInstance.disconnect();
@@ -96,7 +110,57 @@ export default function AetherClient({ isDarkOverride }) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); action(); }
   };
 
-  if (!authChecked) return null;
+  // 当权限检查未完成或 Socket 未连接时显示
+  if (!authChecked) {
+    return (
+      <main className={`fixed inset-0 z-[200] flex flex-col items-center justify-center transition-colors duration-1000 ${
+        isDarkMode ? "bg-[#0f172a]" : "bg-[#f0f9ff]"
+      }`}>
+        {/* 背景装饰：流动的光影 */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] animate-pulse-slow" />
+        </div>
+
+        <div className="relative flex flex-col items-center">
+          {/* 动态加载环 */}
+          <div className="relative w-24 h-24 mb-10">
+            <div className={`absolute inset-0 rounded-full border-2 border-t-transparent animate-spin ${
+              isDarkMode ? 'border-blue-400/30 border-t-blue-400' : 'border-blue-200 border-t-blue-600'
+            }`} />
+            <div className={`absolute inset-4 rounded-full border-2 border-b-transparent animate-spin-reverse opacity-50 ${
+              isDarkMode ? 'border-purple-400/30 border-t-purple-400' : 'border-purple-200 border-t-purple-600'
+            }`} />
+            <div className="absolute inset-0 flex items-center justify-center text-2xl">🌙</div>
+          </div>
+
+          {/* 提示文案 */}
+          <div className="text-center space-y-3">
+            <h2 className={`text-xl font-bold tracking-[0.2em] transition-colors ${
+              isDarkMode ? 'text-blue-100' : 'text-blue-900'
+            }`}>
+              正在接入虹月台
+            </h2>
+            <div className="flex flex-col items-center space-y-1">
+              <p className={`text-[11px] uppercase tracking-widest opacity-60 font-medium ${
+                isDarkMode ? 'text-blue-300' : 'text-blue-600'
+              }`}>
+                Current system is loading slowly
+              </p>
+              <p className={`text-[10px] opacity-40 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                当前系统加载较慢，可能需要等待数秒
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 底部装饰：版本与权限 */}
+        <div className="absolute bottom-12 text-[9px] font-mono tracking-widest opacity-20 uppercase">
+          Aether Rail System • Initializing Core
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={`relative min-h-screen w-full flex flex-col md:flex-row transition-colors duration-700 ${isDarkMode ? "text-slate-100" : "text-slate-800"} font-sans overflow-x-hidden`}>
@@ -167,6 +231,43 @@ export default function AetherClient({ isDarkOverride }) {
         </div>
       )}
 
+      {showAvatarModal && user && (
+        <div className="fixed inset-0 z-[130] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
+          <div className={`${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-white'} rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl border animate-fade-in`}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className={`text-xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>选择头像</h3>
+              <button onClick={() => setShowAvatarModal(false)} className="text-slate-500 hover:text-red-500 transition-colors">关闭</button>
+            </div>
+            
+            <div className="grid grid-cols-4 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+              {user.unlockedAvatars.map((av) => (
+                <div 
+                  key={av} 
+                  onClick={() => socket.emit("update-profile", { 
+                    sessionId: localStorage.getItem("AETHER_SESSION_ID"), 
+                    field: "currentAvatar", 
+                    value: av 
+                  })}
+                  className={`relative aspect-square rounded-2xl overflow-hidden cursor-pointer transition-all hover:scale-110 active:scale-95 border-2 ${
+                    user.currentAvatar === av 
+                      ? 'border-blue-500 ring-4 ring-blue-500/20' 
+                      : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img src={`/avatar/${av}.png`} alt="avatar-option" className="w-full h-full object-cover" />
+                  {user.currentAvatar === av && (
+                    <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center text-white text-xs font-bold">使用中</div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 text-[10px] text-slate-500 text-center opacity-60 tracking-widest uppercase">
+              未来将会投放若干限定头像，可通过活动解锁
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 6. 侧边栏 (Sidebar) */}
       <aside className={`z-20 w-full md:w-80 md:min-h-screen border-b md:border-b-0 md:border-r p-6 flex flex-col shadow-2xl transition-all duration-700 ${
         isDarkMode ? "bg-slate-900/40 border-slate-800" : "bg-white/30 border-white/50 backdrop-blur-xl"
@@ -177,7 +278,13 @@ export default function AetherClient({ isDarkOverride }) {
           <div className="flex flex-col h-full animate-fade-in">
             <div className="flex items-center space-x-4 mb-8">
               <div className="w-16 h-16 rounded-full border-2 border-white shadow-xl animate-pulse-slow overflow-hidden flex-shrink-0">
+              <div 
+                onClick={() => setShowAvatarModal(true)}
+                className="w-16 h-16 rounded-full border-2 border-white shadow-xl animate-pulse-slow overflow-hidden flex-shrink-0 cursor-pointer hover:ring-4 hover:ring-blue-400/50 transition-all group relative"
+              >
                 <img src={`/avatar/${user.currentAvatar}.png`} alt="avatar" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[8px] text-white font-bold">更换</div>
+              </div>
               </div>
               <div className="flex-1 min-w-0">
                 {isEditingName ? (
@@ -271,6 +378,37 @@ export default function AetherClient({ isDarkOverride }) {
               </div>
             </div>
 
+            {/* 新增：在线成员（登录状态下） */}
+            <div className="mt-6 flex-1 flex flex-col min-h-0 overflow-hidden">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                  列车乘员数 ({onlineCount})
+                </p>
+              </div>
+              
+              <div className={`flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 ${
+                isDarkMode ? 'mask-gradient-dark' : 'mask-gradient-light'
+              }`}>
+                {onlineUsers.map((u, i) => (
+                  <div key={i} className={`flex items-center space-x-3 p-2 rounded-xl transition-all ${
+                    isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-white/60'
+                  }`}>
+                    <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
+                      <img src={`/avatar/${u.avatar}.png`} alt="av" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-xs font-medium truncate ${
+                        u.isGuest ? 'opacity-50 italic' : (isDarkMode ? 'text-blue-300' : 'text-blue-600')
+                      }`}>
+                        {u.username}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <button onClick={() => socket.emit("logout", localStorage.getItem("AETHER_SESSION_ID"))} className={`mt-8 w-full py-4 rounded-2xl font-bold transition-all ${
               isDarkMode ? "bg-red-900/40 text-red-400 border border-red-900/50 hover:bg-red-800/60" : "bg-red-500 text-white shadow-lg shadow-red-100 hover:bg-red-600"
             }`}>退出登录</button>
@@ -280,14 +418,44 @@ export default function AetherClient({ isDarkOverride }) {
             <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-8 border transition-colors shadow-inner text-4xl ${
               isDarkMode ? 'bg-slate-800 border-slate-700 opacity-50' : 'bg-white/40 border-white/50 opacity-30'
             }`}>👤</div>
-            <h3 className={`font-bold text-xl mb-10 tracking-tight ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>天境列车候车访客</h3>
+            <h3 className={`font-bold text-xl mb-10 tracking-tight ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>天境列车访客模式</h3>
             <div className="space-y-4 w-full">
               <button onClick={() => socket.emit("auth-request", { createNewGuest: true })} className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all">获取临时车票</button>
               <button onClick={() => setShowLoginModal(true)} className={`w-full py-4 rounded-2xl font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all ${
                 isDarkMode ? 'bg-purple-900/60 text-purple-300 border border-purple-800' : 'bg-purple-600 text-white'
               }`}>出示已有车票</button>
             </div>
+          {/* 新增：在线成员（访客状态下） */}
+          <div className="mt-10 flex-1 flex flex-col min-h-0 overflow-hidden w-full">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                列车乘员数 ({onlineCount})
+              </p>
+            </div>
+            <div className={`flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 ${
+              isDarkMode ? 'mask-gradient-dark' : 'mask-gradient-light'
+            }`}>
+              {onlineUsers.map((u, i) => (
+                <div key={i} className={`flex items-center space-x-3 p-2 rounded-xl transition-all ${
+                  isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-white/60'
+                }`}>
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
+                    <img src={`/avatar/${u.avatar}.png`} alt="av" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-medium truncate ${
+                      u.isGuest ? 'opacity-50 italic' : (isDarkMode ? 'text-blue-300' : 'text-blue-600')
+                    }`}>
+                      {u.username}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
+          
         )}
       </aside>
 
@@ -339,6 +507,25 @@ export default function AetherClient({ isDarkOverride }) {
         .cloud::before, .cloud::after { content: ''; position: absolute; background: inherit; border-radius: inherit; }
         .cloud::before { width: 150px; height: 150px; top: -70px; left: 50px; }
         .cloud::after { width: 200px; height: 200px; top: -100px; left: 120px; }
+        @keyframes spin-reverse {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+        .animate-spin-reverse { animation: spin-reverse 1.5s linear infinite; }
+        /* 4. 新增滚动条样式与边缘淡出 */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+          background: ${isDarkMode ? '#334155' : '#cbd5e1'}; 
+          border-radius: 10px; 
+        }
+        
+        .mask-gradient-dark {
+          mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        }
+        .mask-gradient-light {
+          mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        }
       `}</style>
     </main>
   );
