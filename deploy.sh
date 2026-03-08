@@ -20,14 +20,6 @@ source /etc/environment
 echo "------------------------------------------------"
 log "🚀 DEPLOY START"
 
-# 记录部署触发信息
-{
-    echo "------------------------------------------------"
-    echo "🚀 DEPLOY START: $START_TIME"
-} >> "$STATUS_LOG"
-
-echo "[INFO] Starting DEEP CLEAN deployment for Aether Rail..."
-
 # 1️⃣ 拉取最新代码
 log "Step 1: Pulling latest code..."
 git reset --hard origin/main
