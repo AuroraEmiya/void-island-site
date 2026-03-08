@@ -10,7 +10,7 @@ import { useTheme } from "@/lib/theme";
 export default function AetherClient({}) {
   const [socket, setSocket] = useState(null);
   const [onlineCount, setOnlineCount] = useState(0);
-  const [onlineUsers, setOnlineUsers] = useState({ count: 0, users: [] });
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [rooms, setRooms] = useState([]); // 房间列表
   const [myRoomId, setMyRoomId] = useState(null); // 记录用户当前所在的房间
   const { isDarkMode } = useTheme();
@@ -45,7 +45,11 @@ export default function AetherClient({}) {
   }, []);
 
   useEffect(() => {
-    const socketInstance = io();
+    const socketInstance = io({
+      transports: ["websocket"], 
+      upgrade: false,             // 禁用协议升级，一步到位
+      reconnectionAttempts: 5,    // 限制重连次数，防止无限刷屏
+    });
     setSocket(socketInstance);
     const savedSessionId = localStorage.getItem("AETHER_SESSION_ID");
 

@@ -133,7 +133,7 @@ function broadcastOnlineList(io) {
   // 4. 发送去重后的结果
   io.emit("update-online-list", {
     count: uniqueList.length, // 现在的人数是去重后的“真实人数”
-    users: uniqueList
+    users: uniqueList || [] // 确保发送一个数组，避免前端处理时出错
   });
 }
 

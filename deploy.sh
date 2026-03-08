@@ -4,9 +4,18 @@ set -euo pipefail
 
 PROJECT_ROOT="/var/www/void-island-site"
 APP_NAME="void-island"
+STATUS_LOG="$PROJECT_ROOT/deploy_status.log" # 部署状态追溯文件
+
+START_TIME=$(date "+%Y-%m-%d %H:%M:%S")
 
 cd "$PROJECT_ROOT" || exit 1
 source /etc/environment
+
+# 记录部署触发信息
+{
+    echo "------------------------------------------------"
+    echo "🚀 DEPLOY START: $START_TIME"
+} >> "$STATUS_LOG"
 
 echo "[INFO] Starting DEEP CLEAN deployment for Aether Rail..."
 
@@ -14,6 +23,9 @@ echo "[INFO] Starting DEEP CLEAN deployment for Aether Rail..."
 echo "[INFO] Pulling latest code..."
 git reset --hard origin/main
 git pull origin main
+CURRENT_COMMIT=$(git rev-parse --short HEAD)
+COMMIT_MSG=$(git log -1 --pretty=%B)
+echo "[INFO] Latest Commit: $CURRENT_COMMIT - $COMMIT_MSG" >> "$STATUS_LOG"
 
 # 2️⃣ 关键步骤：彻底清理构建缓存、数据库与临时文件
 echo "[INFO] Cleaning up old artifacts, cache and local DB..."
@@ -40,7 +52,11 @@ npm install
 
 # 5️⃣ 重新构建 (必须执行，server.js 依赖 .next 中的生产产物)
 echo "[INFO] Building Next.js frontend..."
-npm run build
+if npm run build; then
+    echo "[PASS] Build successful" >> "$STATUS_LOG"
+else
+    echo "[FAIL] Build failed at $(date "+%H:%M:%S")" >> "$STATUS_LOG"
+    exit 1
 
 # 6️⃣ 停止并以自定义 Server 模式重启 PM2
 echo "[INFO] Restarting PM2 with custom server.js..."
@@ -49,7 +65,12 @@ pm2 delete "$APP_NAME" 2>/dev/null || true
 
 # ⚠️ 核心改变：不再使用 npm start，而是直接 node server.js
 # 这样才能启动 Socket.io 监听和数据库初始化逻辑
-NODE_ENV=production pm2 start server.js --name "$APP_NAME" --node-args="--max-old-space-size=1024" --update-env 2> vps_error.log
+NODE_ENV=production pm2 start server.js --name "$APP_NAME" --node-args="--max-old-space-size=1024" --update-env
 
 pm2 save
+
+END_TIME=$(date "+%Y-%m-%d %H:%M:%S")
+echo "✅ DEPLOY SUCCESS: $END_TIME (Commit: $CURRENT_COMMIT)" >> "$STATUS_LOG"
+echo "------------------------------------------------" >> "$STATUS_LOG"
+
 echo "[SUCCESS] Aether Rail System is now online."
