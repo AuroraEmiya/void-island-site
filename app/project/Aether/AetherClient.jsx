@@ -437,7 +437,7 @@ export default function AetherClient({}) {
              <div className="mt-10 flex-1 flex flex-col min-h-0 overflow-hidden w-full">
                 {/* ... 访客在线列表同样应用 pb-[100px] ... */}
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-[100px]">
-                   {onlineUsers.map(/* ... */)}
+                   {(onlineUsers || []).map(/* ... */)}
                 </div>
              </div>
           </div>
