@@ -37,9 +37,6 @@ app.prepare().then(() => {
   // 这样它会捕获所有到达这里的请求。
   server.use((req, res) => {
     // 排除 API
-    if (req.path.startsWith('/api')) {
-      return res.status(404).send('API endpoint not found');
-    }
     
     const parsedUrl = parse(req.url, true);
     return handle(req, res, parsedUrl);
