@@ -138,7 +138,7 @@ const IconButton = ({ onClick, title, children, className }) => (
 
 function MusicPlayer() {
 	const [musicList, setMusicList] = useState([]);
-	const [currentIndex, setCurrentIndex] = useState(2);
+	const [currentIndex, setCurrentIndex] = useState(0);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
@@ -170,6 +170,15 @@ function MusicPlayer() {
 			const res = await fetch("/api/music-list");
 			const data = await res.json();
 			setMusicList(data);
+			const targetName = "松本文紀 - 夜の向日葵";
+            const targetIndex = data.findIndex(track => track.name === targetName);
+            
+            // 如果找到了就设为该 index，没找到则默认为 0
+            if (targetIndex !== -1) {
+                setCurrentIndex(targetIndex);
+            } else {
+                setCurrentIndex(0);
+            }
 		}
 		fetchMusicList();
 	}, []);

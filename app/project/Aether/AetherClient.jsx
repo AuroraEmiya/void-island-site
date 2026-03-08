@@ -316,7 +316,7 @@ export default function AetherClient({}) {
 <aside className={`z-20 w-full md:w-80 md:min-h-screen border-b md:border-b-0 md:border-r p-6 flex flex-col shadow-2xl transition-all duration-700 ${
         isDarkMode ? "bg-slate-900/40 border-slate-800" : "bg-white/30 border-white/50 backdrop-blur-xl"
       }`}>
-        <div className="h-16 hidden md:block"></div> {/* 避开右上角按钮 */}
+        <div className="h-12 md:hidden"></div>
 
         {user ? (
           <div className="flex flex-col h-full animate-fade-in">
