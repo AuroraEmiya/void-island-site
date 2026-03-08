@@ -336,7 +336,11 @@ module.exports = function(io) {
         socket.currentRoomId = newId; // 挂载到 socket 用于断线处理
         socket.join(`room-${newId}`);
         socket.emit("room-created", newRoom.serialize());
-        io.emit("update-room-list", Object.values(rooms).map(r => r.serialize()));
+        socket.emit("update-room-list", {
+          rooms: Object.values(rooms).map(r => r.serialize()),
+          myRoomId: newId
+        });
+        socket.broadcast.emit("update-room-list", Object.values(rooms).map(r => r.serialize()));
         return;
       }
 
@@ -357,6 +361,11 @@ module.exports = function(io) {
           userRoomMap[user.uuid] = roomId;
           socket.currentRoomId = roomId;
           socket.join(`room-${roomId}`);
+          
+          socket.emit("update-room-list", {
+            rooms: Object.values(rooms).map(r => r.serialize()),
+            myRoomId: roomId
+          });
         }
         if (action === "removePlayer") {
           delete userRoomMap[user.uuid];
@@ -365,7 +374,7 @@ module.exports = function(io) {
         }
         // 同步状态给所有人
         io.to(`room-${roomId}`).emit("room-info-update", room.serialize());
-        io.emit("update-room-list", Object.values(rooms).map(r => r.serialize()));
+        socket.broadcast.emit("update-room-list", Object.values(rooms).map(r => r.serialize()));
       } else if (result.msg) {
         socket.emit("op-feedback", { type: 'error', message: result.msg });
       }
