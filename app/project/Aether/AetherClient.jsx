@@ -10,7 +10,7 @@ import { useTheme } from "@/lib/theme";
 export default function AetherClient({}) {
   const [socket, setSocket] = useState(null);
   const [onlineCount, setOnlineCount] = useState(0);
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState({ count: 0, users: [] });
   const [rooms, setRooms] = useState([]); // 房间列表
   const [myRoomId, setMyRoomId] = useState(null); // 记录用户当前所在的房间
   const { isDarkMode } = useTheme();
@@ -431,16 +431,48 @@ export default function AetherClient({}) {
             </div>
           </div>
         ) : (
-          /* 访客模式 ... 保持原有逻辑并同样在列表增加 pb-[100px] */
-          <div className="flex flex-col items-center text-center py-10 h-full animate-fade-in">
-             {/* ... 访客按钮部分保持不变 ... */}
-             <div className="mt-10 flex-1 flex flex-col min-h-0 overflow-hidden w-full">
-                {/* ... 访客在线列表同样应用 pb-[100px] ... */}
-                <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-[100px]">
-                   {(onlineUsers || []).map(/* ... */)}
+          <div className="flex flex-col items-center text-center py-10h-fullanimate-fade-in">
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-8 border transition-colors shadow-inner text-4xl ${
+              isDarkMode ? 'bg-slate-800 border-slate-700 opacity-50' : 'bg-white/40 border-white/50 opacity-30'
+            }`}>👤</div>
+            <h3 className={`font-bold text-xl mb-10 tracking-tight ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>天境列车访客模式</h3>
+            <div className="space-y-4 w-full">
+              <button onClick={() => socket.emit("auth-request", { createNewGuest: true })} className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all">获取临时车票</button>
+              <button onClick={() => setShowLoginModal(true)} className={`w-full py-4 rounded-2xl font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all ${
+                isDarkMode ? 'bg-purple-900/60 text-purple-300 border border-purple-800' : 'bg-purple-600 text-white'
+              }`}>出示已有车票</button>
+            </div>
+          {/* 新增：在线成员（访客状态下） */}
+          <div className="mt-10 flex-1 flex flex-col min-h-0 overflow-hidden w-full">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                列车乘员数 ({onlineCount})
+              </p>
+            </div>
+            <div className={`flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2 pb-[100px] ${
+              isDarkMode ? 'mask-gradient-dark' : 'mask-gradient-light'
+            }`}>
+              {onlineUsers.map((u, i) => (
+                <div key={i} className={`flex items-center space-x-3 p-2 rounded-xl transition-all ${
+                  isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-white/60'
+                }`}>
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
+                    <img src={`/avatar/${u.avatar}.png`} alt="av" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-medium truncate ${
+                      u.isGuest ? 'opacity-50 italic' : (isDarkMode ? 'text-blue-300' : 'text-blue-600')
+                    }`}>
+                      {u.username}
+                    </p>
+                  </div>
                 </div>
-             </div>
+              ))}
+            </div>
           </div>
+        </div>
+         
         )}
       </aside>
 
