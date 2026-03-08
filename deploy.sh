@@ -49,7 +49,7 @@ pm2 delete "$APP_NAME" 2>/dev/null || true
 
 # ⚠️ 核心改变：不再使用 npm start，而是直接 node server.js
 # 这样才能启动 Socket.io 监听和数据库初始化逻辑
-NODE_ENV=production pm2 start server.js --name "$APP_NAME" --node-args="--max-old-space-size=1024" --update-env
+NODE_ENV=production pm2 start server.js --name "$APP_NAME" --node-args="--max-old-space-size=1024" --update-env 2> vps_error.log
 
 pm2 save
 echo "[SUCCESS] Aether Rail System is now online."
