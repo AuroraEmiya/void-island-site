@@ -120,7 +120,7 @@ export default function AetherClient({}) {
         setRooms(data);
       } else {
         setRooms(data.rooms || []);
-        if (data.myRoomId) setMyRoomId(data.myRoomId);
+        setMyRoomId(data.myRoomId);
       }
     });
 
@@ -228,14 +228,31 @@ export default function AetherClient({}) {
         <div className={`cloud cloud-3 ${isDarkMode ? 'star-style' : ''}`} />
       </div>
 
-      {/* 4. 操作反馈 Toast */}
-      {toast && (
-        <div className={`fixed top-10 left-1/2 -translate-x-1/2 z-[110] px-8 py-3 rounded-full backdrop-blur-xl shadow-2xl border transition-all animate-bounce-in ${
-          toast.type === 'error' ? 'bg-red-500/90 border-red-400 text-white' : (isDarkMode ? 'bg-blue-500/80 border-blue-400 text-white' : 'bg-white/80 border-blue-200 text-blue-600')
-        }`}>
-          {toast.message}
-        </div>
-      )}
+    {/* 4. 操作反馈 Toast */}
+    {toast && (
+      <div 
+        className={`
+          fixed top-10 z-[110] px-8 py-3 rounded-full 
+          backdrop-blur-xl shadow-2xl border 
+          transition-all animate-bounce-in
+          /* 核心修改：不使用 -translate-x-1/2 */
+          left-1/2 
+          -ml-[fit-content] /* 占位符，实际逻辑如下 */
+          ${toast.type === 'error' 
+            ? 'bg-red-500/90 border-red-400 text-white' 
+            : (isDarkMode ? 'bg-blue-500/80 border-blue-400 text-white' : 'bg-white/80 border-blue-200 text-blue-600')
+          }
+        `}
+        style={{
+          width: 'max-content',
+          transformOrigin: 'center center', // 确保动画从中心弹起
+          left: '50%',
+          transform: 'translateX(-50%)', // 如果动画里没写死 translate，这里依然可以用
+        }}
+      >
+        {toast.message}
+      </div>
+    )}
 
       {/* 5. 凭证弹窗与登录弹窗 (此处逻辑同上，CSS 适配夜间) */}
       {newAccountInfo && (

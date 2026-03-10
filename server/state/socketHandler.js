@@ -266,8 +266,16 @@ module.exports = function(io) {
     socket.on("logout", (sessionId) => {
       if (sessionId) {
         db.prepare("DELETE FROM sessions WHERE session_id = ?").run(sessionId);
-        // ✅ 新增：恢复为访客身份
+        if (socket.currentRoomId) {
+          socket.leave(`room-${socket.currentRoomId}`);
+        }
+        // 2. 抹除挂载的变量
+        delete socket.currentRoomId;
         globalState.onlineUsers[socket.id] = { username: "未登录访客", avatar: "default", isGuest: true };
+        socket.emit("update-room-list", {
+          rooms: Object.values(rooms).map(r => r.serialize()),
+          myRoomId: null
+        });
         broadcastOnlineList(io);
         socket.emit("logout-confirm");
         socket.emit("op-feedback", { type: 'success', message: '已安全退出' });
@@ -358,6 +366,7 @@ module.exports = function(io) {
 
       if (result.success) {
         if (action === "addPlayer") {
+          room.stopDestructionTimer();
           userRoomMap[user.uuid] = roomId;
           socket.currentRoomId = roomId;
           socket.join(`room-${roomId}`);
@@ -367,14 +376,38 @@ module.exports = function(io) {
             myRoomId: roomId
           });
         }
-        if (action === "removePlayer") {
-          delete userRoomMap[user.uuid];
-          socket.leave(`room-${roomId}`);
-          if (result.isEmpty) { /* 处理房间销毁逻辑... */ }
+        
+        if (action === "removePlayer" || action === "kickPlayer" || action === "closeRoom") {
+          if (action === "closeRoom") {
+            // 解散房间：找出房间内所有人的 UUID 并移除绑定
+            // 注意：此时 room 对象还在，但在 result.success 之后我们会删除它
+            room.seats.forEach(s => { if (s) delete userRoomMap[s.uuid]; });
+          } else {
+            // 踢人或自离：只移除目标用户的绑定
+            const targetUuid = (action === "kickPlayer") ? data.targetUuid : user.uuid;
+            delete userRoomMap[targetUuid];
+          }
         }
-        // 同步状态给所有人
-        io.to(`room-${roomId}`).emit("room-info-update", room.serialize());
-        socket.broadcast.emit("update-room-list", Object.values(rooms).map(r => r.serialize()));
+
+        // 3. 处理房间实例的销毁
+        if (result.isEmpty || action === "closeRoom") {
+          delete rooms[roomId];
+          // 通知房间内所有人：车厢到站解散了，请下车（回到大厅）
+          io.to(`room-${roomId}`).emit("room-closed");
+        }
+
+        // 4. 同步状态
+        // 如果房间还没被删，通知房间内的人更新 UI（比如看到谁换座了，谁准备了）
+        if (rooms[roomId]) {
+          io.to(`room-${roomId}`).emit("room-info-update", room.serialize());
+        }
+
+        // 全局广播：刷新大厅的房间列表（人数变动、房间消失等）
+        io.emit("update-room-list", {
+          rooms: Object.values(rooms).map(r => r.serialize()),
+          myRoomId: userRoomMap[user.uuid] || null
+        });
+
       } else if (result.msg) {
         socket.emit("op-feedback", { type: 'error', message: result.msg });
       }

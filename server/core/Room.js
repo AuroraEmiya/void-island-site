@@ -30,6 +30,10 @@ class Room {
         }, 5 * 60 * 1000); // 5分钟
     }
 
+    checkHost(uuid) {
+      return this.hostId === uuid;
+    }
+
     // 停止销毁倒计时
     stopDestructionTimer() {
         if (this.destructionTimer) {
@@ -117,6 +121,76 @@ class Room {
       return this.readyStatus[uuid];
     }
  
+// 修改房间配置（名、游戏、人数上限等）
+updateConfig({ uuid, config }) {
+  if (!this.checkHost(uuid)) return { success: false, msg: "只有列车长有权调整配置" };
+  if (this.status !== 'WAITING') return { success: false, msg: "列车已发车，无法调整配置" };
+  
+  if (config.ruleId) this.ruleId = config.ruleId;
+  if (config.maxSeats) {
+      // 调整座位数组大小，需确保缩减时不把正在坐着的人踢了
+      const currentPlayers = this.seats.filter(s => s !== null).length;
+      if (config.maxSeats < currentPlayers) return { success: false, msg: "当前乘客多于目标座位数" };
+      
+      const newSeats = new Array(config.maxSeats).fill(null);
+      let pIndex = 0;
+      this.seats.forEach(s => {
+          if (s) newSeats[pIndex++] = s;
+      });
+      this.seats = newSeats;
+  }
+  return { success: true };
+}
+
+  // 踢出玩家
+  kickPlayer({ uuid, targetUuid }) {
+    if (!this.checkHost(uuid)) return { success: false, msg: "只有列车长能赶人走" };
+    if (targetUuid === this.hostId) return { success: false, msg: "不能踢出你自己" };
+    return this.removePlayer(targetUuid);
+  }
+
+  // 转让房主
+  transferHost({ uuid, targetUuid }) {
+    if (!this.checkHost(uuid)) return { success: false, msg: "只有现任列车长可以转让权限" };
+    const isPresent = this.seats.some(s => s && s.uuid === targetUuid);
+    if (!isPresent) return { success: false, msg: "目标玩家不在车厢内" };
+    
+    this.hostId = targetUuid;
+    return { success: true };
+  }
+
+  // 强制关闭房间
+  closeRoom({ uuid }) {
+    if (!this.checkHost(uuid)) return { success: false, msg: "无权关闭" };
+    this.seats = this.seats.map(() => null); // 清空所有人
+    return { success: true, isEmpty: true };
+  }
+
+  // 开始游戏
+  startGame({ uuid }) {
+    if (!this.checkHost(uuid)) return { success: false, msg: "只有列车长可以发车" };
+    
+    const playerIds = this.seats.filter(s => s !== null).map(s => s.uuid);
+    if (playerIds.length < 2) return { success: false, msg: "至少需要两名乘客才能发车" };
+
+    // 检查是否全员准备
+    const allReady = playerIds.every(id => id === this.hostId || this.readyStatus[id]);
+    if (!allReady) return { success: false, msg: "仍有乘客未准备就绪" };
+
+    this.status = 'GAMING';
+    // 之后在这里 new 具体的游戏逻辑类
+    // this.gameInstance = new (getGameClass(this.ruleId))(this);
+    
+    return { success: true };
+  }
+
+  // 结束游戏
+  endGame() {
+    this.status = 'FINISHED';
+    // 延迟一段时间自动切回 WAITING 供再开一局，或者保持 FINISHED 等待房主重置
+    return { success: true };
+  }
+
     // 序列化房间信息（发给前端用）
     serialize() {
       return {
