@@ -117,3 +117,15 @@ npm start
 ---
 
 **Visit Me:** [void-island.com](https://void-island.com)
+
+---
+
+## 📄 License / 协议
+
+- **Code (代码):** Licensed under [MIT](LICENSE). 
+  允许自由使用、闭源、商用，只需保留原作者版权声明。
+- **Content (内容):** All articles, world-building, and artistic assets are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.zh).
+  允许自由共享、演绎（二创）及商用，但必须给出适当的**署名 (Credit: 涟漪Rippin)**。
+
+> "你可以带走空岛的火种去点亮任何地方，只需记得它曾在这里燃烧过。"
+> "You may take the sparks of Void-Island to light any fire, as long as you remember where they first burned."
