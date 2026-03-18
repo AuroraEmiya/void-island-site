@@ -16,7 +16,7 @@ class Room {
       this.gameInstance = null;
      
       // 自动将房主加入 0 号位
-      this.addPlayer(hostUser, 0);
+      this.addPlayer({ user: hostUser });
 
       this.destructionTimer = null;
     }
@@ -51,9 +51,8 @@ class Room {
         return { success: false, msg: `未知操作: ${action}` };
     }
 
-    addPlayer(input) {
+    addPlayer({ user }) {
       // 1. 统一标识符
-      const user = input.user ? input.user : input; // 兼容直接传 User 对象或 { user: User } 的情况
       const requestUuid = user.uuid;
 
       // 2. 幂等性校验（解决同账号多开/刷新重连）
@@ -105,7 +104,7 @@ class Room {
     }
 
     // 离开玩家
-    removePlayer(uuid) {
+    removePlayer({ uuid }) {
         const index = this.seats.findIndex(s => s && s.uuid === uuid);
         if (index !== -1) {
         this.seats[index] = null;
@@ -117,8 +116,19 @@ class Room {
 
     // 准备/取消准备
     toggleReady({ uuid }) {
+      // 1. 房主不需要准备逻辑（对应我们选定的方案 3）
+      if (uuid === this.hostId) {
+        return { success: false, msg: "列车长无需准备，请直接发车" };
+      }
+    
+      // 2. 正常切换准备状态
       this.readyStatus[uuid] = !this.readyStatus[uuid];
-      return this.readyStatus[uuid];
+      
+      // 3. 返回 success 告知 action 处理器进行广播
+      return { 
+        success: true, 
+        isReady: this.readyStatus[uuid] 
+      };
     }
  
 // 修改房间配置（名、游戏、人数上限等）
@@ -146,7 +156,7 @@ updateConfig({ uuid, config }) {
   kickPlayer({ uuid, targetUuid }) {
     if (!this.checkHost(uuid)) return { success: false, msg: "只有列车长能赶人走" };
     if (targetUuid === this.hostId) return { success: false, msg: "不能踢出你自己" };
-    return this.removePlayer(targetUuid);
+    return this.removePlayer({ uuid: targetUuid });
   }
 
   // 转让房主
@@ -162,6 +172,7 @@ updateConfig({ uuid, config }) {
   // 强制关闭房间
   closeRoom({ uuid }) {
     if (!this.checkHost(uuid)) return { success: false, msg: "无权关闭" };
+    this.stopDestructionTimer(); // 既然都要删了，把定时器也关掉
     this.seats = this.seats.map(() => null); // 清空所有人
     return { success: true, isEmpty: true };
   }
@@ -171,7 +182,6 @@ updateConfig({ uuid, config }) {
     if (!this.checkHost(uuid)) return { success: false, msg: "只有列车长可以发车" };
     
     const playerIds = this.seats.filter(s => s !== null).map(s => s.uuid);
-    if (playerIds.length < 2) return { success: false, msg: "至少需要两名乘客才能发车" };
 
     // 检查是否全员准备
     const allReady = playerIds.every(id => id === this.hostId || this.readyStatus[id]);

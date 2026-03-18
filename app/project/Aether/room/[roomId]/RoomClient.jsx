@@ -30,6 +30,11 @@ export default function RoomClientPage({ roomId }) {
     socket.on("room-info-update", (data) => { setRoomData(data); setStatus("READY"); });
     socket.on("room-closed", () => router.push("/project/Aether"));
     
+    socket.on("op-feedback", ({ type, message }) => {
+      console.log(`[Server Feedback] ${type}: ${message}`);
+      if (type === 'error') alert(message); // 或者用更优雅的 toast
+    });
+
     return () => socket.disconnect();
   }, [roomId, router]);
 
@@ -83,9 +88,26 @@ export default function RoomClientPage({ roomId }) {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest leading-tight">乘客人数</span>
-                  <div className="flex items-center gap-1 h-[16px]">
+                  <div className="flex items-center gap-1 h-[20px]">
                     <Users size={12} className="text-blue-400"/>
-                    <span className="text-xs font-black">{playerCount} / {roomData.seats.length}</span>
+                    {isHost ? (
+                      /* 房主模式：显示下拉选择框以调整上限 */
+                      <div className="relative flex items-center group">
+                        <select 
+                          className="appearance-none bg-blue-400/5 border border-transparent hover:border-blue-300/50 rounded px-1 pr-4 text-xs font-black text-slate-700 focus:outline-none cursor-pointer transition-all"
+                          value={roomData.seats.length}
+                          onChange={(e) => dispatch("updateConfig", { config: { maxSeats: parseInt(e.target.value) } })}
+                        >
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(num => (
+                            <option key={num} value={num} disabled={num < playerCount}>{num} 人</option>
+                          ))}
+                        </select>
+                        <ChevronDown size={8} className="absolute right-0.5 pointer-events-none text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    ) : (
+                      /* 乘客模式：仅显示静态文本 */
+                      <span className="text-xs font-black text-slate-700">{playerCount} / {roomData.seats.length}</span>
+                    )}
                   </div>
                 </div>
                 {/* 1. 父容器增加 items-center，确保子元素（标题和选择框）中轴线对齐 */}
@@ -131,10 +153,23 @@ export default function RoomClientPage({ roomId }) {
             </div>
             
             <button 
-              onClick={() => router.push("/project/Aether")}
-              className="w-fit flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-100/50 hover:bg-red-50 text-blue-400 hover:text-red-500 transition-all text-[10px] font-black"
+              onClick={() => {
+                if (isHost) {
+                  // 房主：直接解散房间
+                  dispatch("closeRoom");
+                } else {
+                  // 乘客：永久离开
+                  dispatch("removePlayer");
+                }
+                // 动作发出后，由于后端会触发 room-closed 或 update-room-list，
+                // 我们在 useEffect 里的监听会自动把用户导向首页。
+              }}
+              className={`w-fit flex items-center gap-2 px-4 py-2 rounded-xl transition-all text-[10px] font-black ${
+                "bg-red-100/50 text-red-400 hover:bg-red-500 hover:text-white" 
+              }`}
             >
-              <LogOut size={12} /> 离开站台
+              <LogOut size={12} /> 
+              {isHost ? "关闭站台" : "离开站台"}
             </button>
           </div>
 
@@ -195,14 +230,14 @@ export default function RoomClientPage({ roomId }) {
 
             {roomData.seats.map((seat, i) => {
               const angle = i * (360 / roomData.seats.length);
-              const radius = 170;
+              const radius = 190;
               return (
                 <div key={i} className="absolute left-1/2 top-1/2" style={{ transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${radius}px) rotate(-${angle}deg)` }}>
                   <div className="flex flex-col items-center group">
                     <span className="text-[14px] font-black text-blue-300 mb-1">{i+1}</span>
                     <div 
                       onClick={() => !seat && dispatch("changeSeat", { newSeatIndex: i })}
-                      className={`w-14 h-14 rounded-2xl p-0.5 transition-all cursor-pointer shadow-lg relative ${
+                      className={`w-20 h-20 rounded-2xl p-0.5 transition-all cursor-pointer shadow-lg relative ${
                         seat ? (roomData.readyStatus[seat.uuid] ? "bg-emerald-400" : "bg-blue-400") : "bg-white/50 border-2 border-dashed border-blue-200"
                       }`}
                     >
@@ -216,10 +251,20 @@ export default function RoomClientPage({ roomId }) {
                               </div>
                             )}
                           </>
-                        ) : <div className="w-full h-full flex items-center justify-center opacity-10 text-blue-300"><Users size={20}/></div>}
+                        ) : (
+                        <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
+                          <div className="opacity-10 text-blue-300 group-hover:opacity-0 transition-opacity">
+                            <Users size={24}/>
+                          </div>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                            <span className="text-[10px] font-black text-blue-500 tracking-tighter">MOVE</span>
+                            <ChevronDown size={14} className="text-blue-500 -mt-1 animate-bounce" />
+                          </div>
+                        </div> 
+                        )}
                       </div>
                     </div>
-                    <span className="text-[12px] font-bold mt-2 text-slate-500 bg-white/30 px-2 rounded-full backdrop-blur-sm truncate max-w-[80px]">
+                    <span className="text-[14px] font-bold mt-2 text-slate-500 bg-white/30 px-2 rounded-full backdrop-blur-sm truncate max-w-[120px]">
                       {seat?.username || "EMPTY"}
                     </span>
                   </div>
@@ -229,25 +274,58 @@ export default function RoomClientPage({ roomId }) {
           </div>
         </div>
 
-        <div className="w-[340px] flex flex-col gap-2 scale-90 origin-right">
+        <div className="w-[340px] flex flex-col gap-2 origin-right">
           {roomData.seats.map((seat, i) => (
-            <div key={i} className={`group relative p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 cursor-pointer backdrop-blur-md ${seat ? "bg-white/50 border-white shadow-sm" : "bg-white/10 border-dashed border-blue-200 opacity-60"}`}>
+            <div key={i} className={`group relative p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 cursor-pointer backdrop-blur-md 
+              ${
+                seat 
+                  ? seat.uuid === roomData.hostId 
+                    ? "bg-amber-50/80 border-amber-200 shadow-[0_0_15px_rgba(251,191,36,0.1)]" // 房主金色外观
+                    : "bg-white/50 border-white shadow-sm" 
+                  : "bg-white/10 border-dashed border-blue-200 opacity-60"
+              }`}>
               <div className="relative z-10">
-                <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 ${roomData.readyStatus[seat?.uuid] ? 'border-emerald-400' : 'border-white'}`}>
+              <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 ${
+                seat?.uuid === roomData.hostId 
+                  ? 'border-amber-400' 
+                  : roomData.readyStatus[seat?.uuid] ? 'border-emerald-400' : 'border-white'
+              }`}>
                   {seat && <img src={`/avatar/${seat.avatar}.png`} className={`w-full h-full object-cover ${roomData.readyStatus[seat.uuid] ? 'opacity-40' : ''}`} />}
                 </div>
-                {seat && roomData.readyStatus[seat.uuid] && <CheckCircle className="absolute inset-0 m-auto text-emerald-500" size={18}/>}
+                {seat && seat.uuid !== roomData.hostId && roomData.readyStatus[seat.uuid] && (
+                  <CheckCircle className="absolute inset-0 m-auto text-emerald-500" size={20}/>
+                )}
               </div>
               <div className="flex-1 z-10">
+
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-black italic text-slate-700">{seat?.username || "待加入"}</span>
-                  {seat && roomData.readyStatus[seat.uuid] && <span className="text-[7px] px-1 py-0.5 bg-emerald-500 text-white rounded font-black">READY</span>}
+                  <span className="text-[15px] font-black italic text-slate-700">{seat?.username || "待加入"}</span>
+                  
+                  {seat && (
+                    seat.uuid === roomData.hostId ? (
+                      /* 房主标签：使用更温暖的琥珀色，增加间距 */
+                      <span className="text-[12px] px-2 py-0.5 bg-amber-400 text-white rounded-md font-black flex items-center gap-1 shadow-sm tracking-wider">
+                        <Crown size={10} fill="currentColor" className="mb-0.5"/> 房主
+                      </span>
+                    ) : roomData.readyStatus[seat.uuid] ? (
+                      /* 已准备标签：翡翠绿，搭配白色文字 */
+                      <span className="text-[12px] px-2 py-0.5 bg-emerald-500 text-white rounded-md font-black shadow-sm tracking-wider">
+                        已准备
+                      </span>
+                    ) : (
+                      /* 未准备标签：低调的灰蓝色，文字稍微加深一点对比度 */
+                      <span className="text-[12px] px-2 py-0.5 bg-slate-200 text-slate-500 rounded-md font-black tracking-wider">
+                        未准备
+                      </span>
+                    )
+                  )}
                 </div>
-                <div className="text-[8px] font-mono text-blue-300 tracking-tighter italic">ID: {seat?.uuid.slice(0,8) || "--------"}</div>
+
+                <div className="text-[14px] font-mono text-blue-500 tracking-tighter italic">ID: {seat?.uuid.slice(0,8) || "--------"}</div>
               </div>
               {isHost && seat && seat.uuid !== user.uuid && (
-                <button onClick={(e) => {e.stopPropagation(); dispatch("kickPlayer", { targetUuid: seat.uuid });}} className="p-2 text-blue-200 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
-                  <UserMinus size={14}/>
+                <button onClick={(e) => {e.stopPropagation(); dispatch("kickPlayer", { targetUuid: seat.uuid });}} className="p-2 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-fulltransition-colors">
+                  <UserMinus size={22}/>
                 </button>
               )}
             </div>
@@ -258,7 +336,7 @@ export default function RoomClientPage({ roomId }) {
       <footer className="h-24 flex justify-center items-center pb-6">
         {isHost ? (
           <button onClick={() => dispatch("startGame")} className="px-16 py-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-2xl font-black text-lg shadow-[0_10px_25px_rgba(59,130,246,0.3)] transition-all active:scale-95 flex items-center gap-3 tracking-[0.1em]">
-            <Play fill="white" size={18}/> 发车开始
+            <Play fill="white" size={18}/> 游戏开始
           </button>
         ) : (
           <button onClick={() => dispatch("toggleReady")} className={`px-16 py-3.5 rounded-2xl font-black text-lg transition-all active:scale-95 shadow-md border-2 ${myReadyStatus ? "bg-white/80 border-blue-100 text-blue-300 backdrop-blur-md" : "bg-white border-blue-400 text-blue-500"}`}>
