@@ -98,7 +98,7 @@ export default function RoomClientPage({ roomId }) {
                           value={roomData.seats.length}
                           onChange={(e) => dispatch("updateConfig", { config: { maxSeats: parseInt(e.target.value) } })}
                         >
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(num => (
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
                             <option key={num} value={num} disabled={num < playerCount}>{num} 人</option>
                           ))}
                         </select>
@@ -219,7 +219,7 @@ export default function RoomClientPage({ roomId }) {
       </section>
 
       {/* 2. 中心区域 & 3. 底部操作保持 */}
-      <main className="flex-1 w-full max-w-6xl mx-auto flex items-center px-6 gap-2">
+      <main className="flex-1 w-full max-w-6xl mx-auto flex items-center px-6 gap-6">
         <div className="flex-1 flex items-center justify-center relative scale-[0.75] origin-center">
           <div className="relative w-[260px] h-[260px]">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white to-blue-50 shadow-[15px_15px_40px_rgba(148,163,184,0.15)] flex items-center justify-center border border-white">
@@ -237,7 +237,7 @@ export default function RoomClientPage({ roomId }) {
                     <span className="text-[14px] font-black text-blue-300 mb-1">{i+1}</span>
                     <div 
                       onClick={() => !seat && dispatch("changeSeat", { newSeatIndex: i })}
-                      className={`w-20 h-20 rounded-2xl p-0.5 transition-all cursor-pointer shadow-lg relative ${
+                      className={`w-16 h-16 rounded-2xl p-0.5 transition-all cursor-pointer shadow-lg relative ${
                         seat ? (roomData.readyStatus[seat.uuid] ? "bg-emerald-400" : "bg-blue-400") : "bg-white/50 border-2 border-dashed border-blue-200"
                       }`}
                     >
@@ -274,63 +274,65 @@ export default function RoomClientPage({ roomId }) {
           </div>
         </div>
 
-        <div className="w-[340px] flex flex-col gap-2 origin-right">
-          {roomData.seats.map((seat, i) => (
-            <div key={i} className={`group relative p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 cursor-pointer backdrop-blur-md 
-              ${
-                seat 
-                  ? seat.uuid === roomData.hostId 
-                    ? "bg-amber-50/80 border-amber-200 shadow-[0_0_15px_rgba(251,191,36,0.1)]" // 房主金色外观
-                    : "bg-white/50 border-white shadow-sm" 
-                  : "bg-white/10 border-dashed border-blue-200 opacity-60"
-              }`}>
-              <div className="relative z-10">
-              <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 ${
-                seat?.uuid === roomData.hostId 
-                  ? 'border-amber-400' 
-                  : roomData.readyStatus[seat?.uuid] ? 'border-emerald-400' : 'border-white'
-              }`}>
-                  {seat && <img src={`/avatar/${seat.avatar}.png`} className={`w-full h-full object-cover ${roomData.readyStatus[seat.uuid] ? 'opacity-40' : ''}`} />}
-                </div>
-                {seat && seat.uuid !== roomData.hostId && roomData.readyStatus[seat.uuid] && (
-                  <CheckCircle className="absolute inset-0 m-auto text-emerald-500" size={20}/>
-                )}
-              </div>
-              <div className="flex-1 z-10">
+{/* 找到右侧侧边栏区域，修改为如下结构 */}
+<div className="w-[340px] h-full max-h-[360px] flex flex-col relative group/sidebar">
+  {/* h-full 和 max-h-[520px] 确保它不会无限拉长，
+    max-h 的值可以根据你桌子的 scale(0.75) 后的视觉高度微调
+  */}
+  <div className="flex-1 overflow-y-auto pr-2 aether-scrollbar">
+    <div className="flex flex-col gap-2.5">
+      {roomData.seats.map((seat, i) => (
+        <div key={i} className={`
+          relative p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 cursor-pointer backdrop-blur-md shrink-0
+          ${seat 
+              ? seat.uuid === roomData.hostId 
+                ? "bg-amber-50/80 border-amber-200 shadow-sm" 
+                : "bg-white/50 border-white shadow-sm" 
+              : "bg-white/10 border-dashed border-blue-200 opacity-60"}
+        `}>
+          <div className="relative z-10">
+            <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 ${
+              seat?.uuid === roomData.hostId 
+                ? 'border-amber-400' 
+                : roomData.readyStatus[seat?.uuid] ? 'border-emerald-400' : 'border-white'
+            }`}>
+              {seat && <img src={`/avatar/${seat.avatar}.png`} className={`w-full h-full object-cover ${roomData.readyStatus[seat.uuid] ? 'opacity-40' : ''}`} />}
+            </div>
+            {seat && seat.uuid !== roomData.hostId && roomData.readyStatus[seat.uuid] && (
+              <CheckCircle className="absolute inset-0 m-auto text-emerald-500" size={20}/>
+            )}
+          </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-[15px] font-black italic text-slate-700">{seat?.username || "待加入"}</span>
-                  
-                  {seat && (
-                    seat.uuid === roomData.hostId ? (
-                      /* 房主标签：使用更温暖的琥珀色，增加间距 */
-                      <span className="text-[12px] px-2 py-0.5 bg-amber-400 text-white rounded-md font-black flex items-center gap-1 shadow-sm tracking-wider">
-                        <Crown size={10} fill="currentColor" className="mb-0.5"/> 房主
-                      </span>
-                    ) : roomData.readyStatus[seat.uuid] ? (
-                      /* 已准备标签：翡翠绿，搭配白色文字 */
-                      <span className="text-[12px] px-2 py-0.5 bg-emerald-500 text-white rounded-md font-black shadow-sm tracking-wider">
-                        已准备
-                      </span>
-                    ) : (
-                      /* 未准备标签：低调的灰蓝色，文字稍微加深一点对比度 */
-                      <span className="text-[12px] px-2 py-0.5 bg-slate-200 text-slate-500 rounded-md font-black tracking-wider">
-                        未准备
-                      </span>
-                    )
-                  )}
-                </div>
-
-                <div className="text-[14px] font-mono text-blue-500 tracking-tighter italic">ID: {seat?.uuid.slice(0,8) || "--------"}</div>
-              </div>
-              {isHost && seat && seat.uuid !== user.uuid && (
-                <button onClick={(e) => {e.stopPropagation(); dispatch("kickPlayer", { targetUuid: seat.uuid });}} className="p-2 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-fulltransition-colors">
-                  <UserMinus size={22}/>
-                </button>
+          <div className="flex-1 z-10 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[15px] font-black italic text-slate-700 truncate">{seat?.username || "待加入"}</span>
+              {seat && (
+                <span className={`text-[11px] px-2 py-0.5 rounded-md font-black shadow-sm tracking-wider whitespace-nowrap ${
+                  seat.uuid === roomData.hostId ? "bg-amber-400 text-white" : 
+                  roomData.readyStatus[seat.uuid] ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"
+                }`}>
+                  {seat.uuid === roomData.hostId ? "房主" : roomData.readyStatus[seat.uuid] ? "已准备" : "未准备"}
+                </span>
               )}
             </div>
-          ))}
+            <div className="text-[12px] font-mono text-blue-500 tracking-tighter italic">
+              ID: {seat?.uuid.slice(0,8) || "--------"}
+            </div>
+          </div>
+
+          {isHost && seat && seat.uuid !== user.uuid && (
+            <button onClick={(e) => {e.stopPropagation(); dispatch("kickPlayer", { targetUuid: seat.uuid });}} className="p-2 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors">
+              <UserMinus size={22}/>
+            </button>
+          )}
         </div>
+      ))}
+    </div>
+  </div>
+  
+  {/* 装饰性渐变：当人数多产生滚动时，底部边缘会显得更平滑 */}
+  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#cfdef3]/50 to-transparent pointer-events-none rounded-b-2xl"></div>
+</div>
       </main>
 
       <footer className="h-24 flex justify-center items-center pb-6">
@@ -339,7 +341,7 @@ export default function RoomClientPage({ roomId }) {
             <Play fill="white" size={18}/> 游戏开始
           </button>
         ) : (
-          <button onClick={() => dispatch("toggleReady")} className={`px-16 py-3.5 rounded-2xl font-black text-lg transition-all active:scale-95 shadow-md border-2 ${myReadyStatus ? "bg-white/80 border-blue-100 text-blue-300 backdrop-blur-md" : "bg-white border-blue-400 text-blue-500"}`}>
+          <button onClick={() => dispatch("toggleReady")} className={`px-16 py-3.5 rounded-2xl font-black text-lg transition-all active:scale-95 shadow-md border-2 bg-white border-blue-400 text-blue-500`}>
             {myReadyStatus ? "取消准备" : "准备就绪"}
           </button>
         )}

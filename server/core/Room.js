@@ -174,11 +174,12 @@ updateConfig({ uuid, config }) {
     if (!this.checkHost(uuid)) return { success: false, msg: "无权关闭" };
     this.stopDestructionTimer(); // 既然都要删了，把定时器也关掉
     this.seats = this.seats.map(() => null); // 清空所有人
-    return { success: true, isEmpty: true };
+    return { success: true, isEmpty: true, msg: "房间已解散" };
   }
 
   // 开始游戏
   startGame({ uuid }) {
+    return { success: false, msg: "游戏逻辑还没写好，敬请期待！" };
     if (!this.checkHost(uuid)) return { success: false, msg: "只有列车长可以发车" };
     
     const playerIds = this.seats.filter(s => s !== null).map(s => s.uuid);
