@@ -578,7 +578,7 @@ export default function AetherClient({}) {
                       </div>
                       <div className="text-right">
                         <p className="text-xs font-mono font-bold opacity-60">
-                          {room.seats.filter(s => s !== null).length} / 4
+                          {room.seats.filter(s => s !== null).length} / {room.seats.length}
                         </p>
                       </div>
                     </div>
