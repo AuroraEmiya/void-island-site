@@ -507,7 +507,7 @@ export default function AetherClient({}) {
           
           {/* 标题：mb 从 4 降到 2，缩小垂直占用 */}
           <h2 className={`text-5xl md:text-7xl font-black mb-2 uppercase tracking-tighter opacity-10 transition-colors shrink-0 ${isDarkMode ? 'text-white' : 'text-blue-900'}`}>
-            虹月台站台列表（房间内部尚未搭建，敬请期待）
+            虹月台站台列表
           </h2>
           
           {/* 房间网格布局容器 */}

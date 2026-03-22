@@ -27,7 +27,7 @@ export default function RPSView({ gameState, players, myUuid, onAction }) {
               /* 修改点 2: transform 逻辑开头必须加上 -50%, -50% 的位移修正 */
               className="absolute left-1/2 top-1/2 transition-all duration-500"
               style={{ 
-                transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-160px) rotate(-${angle}deg)` 
+                transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-140px) rotate(-${angle}deg)` 
               }}
             >
             {!winnerId && 
@@ -103,17 +103,17 @@ export default function RPSView({ gameState, players, myUuid, onAction }) {
                 <img src={`/avatar/${winnerData?.avatar}.png`} className="w-full h-full object-cover" />
              </div>
              <div className="text-center">
-                <p className="text-amber-400 text-sm font-bold tracking-widest uppercase">本轮游戏的胜者是：</p>
+                <p className="text-amber-400 text-s font-bold tracking-widest uppercase">本轮游戏的胜者是：</p>
                 <p className="text-white text-4xl font-black">{winnerData?.username || "神秘玩家"}</p>
              </div>
-             <div className="text-white/40 text-[10px] font-mono mt-2 animate-pulse">10秒后返回等待界面...</div>
+             <div className="text-white/40 text-[12px] font-mono mt-2 animate-pulse">10秒后返回等待界面...</div>
           </div>
         </div>
       )}
 
       {/* 底部结果提示 */}
       {!winnerId && gameState.lastRoundResult && (
-        <div className="absolute bottom-8 px-6 py-2 bg-black/40 backdrop-blur-md rounded-full text-white text-[14px] font-bold border border-white/10">
+        <div className="absolute items-center px-6 py-2 bg-black/20 backdrop-blur-md rounded-full text-white text-[14px] font-bold border border-white/10">
           系统播报: {gameState.lastRoundResult}
         </div>
       )}

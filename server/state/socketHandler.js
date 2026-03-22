@@ -48,8 +48,8 @@ db.exec(`
     password_hash TEXT, -- 存储密码
     role TEXT DEFAULT 'guest',
     profile TEXT DEFAULT '这个访客很懒，什么都没写。',
-    current_avatar TEXT DEFAULT 'XingHui',
-    unlocked_avatars TEXT DEFAULT '["default", "XingHui", "YingCao"]',
+    current_avatar TEXT DEFAULT 'MGMT_SakurabaEma',
+    unlocked_avatars TEXT DEFAULT '["default", "XingHui", "YingCao", "MGMT_SakurabaEma", "MGMT_NikaidouHiro", "MGMT_SherryTachibana"]',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     expired_at DATETIME
   );
