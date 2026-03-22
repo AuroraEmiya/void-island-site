@@ -1,5 +1,6 @@
 "use client";
-
+import dynamic from 'next/dynamic';
+import { useMemo } from 'react';
 import React, { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
@@ -14,6 +15,7 @@ export default function RoomClientPage({ roomId }) {
   const [roomData, setRoomData] = useState(null);
   const [user, setUser] = useState(null);
   const [status, setStatus] = useState("CONNECTING");
+  const [availableGames, setAvailableGames] = useState([]);
 
   useEffect(() => {
     const savedSessionId = localStorage.getItem("AETHER_SESSION_ID");
@@ -25,7 +27,11 @@ export default function RoomClientPage({ roomId }) {
     socket.on("connect", () => socket.emit("auth-request", { sessionId: savedSessionId }));
     socket.on("auth-success", (userData) => {
       setUser(userData);
+      socket.emit("get-available-games");
       socket.emit("room-action", { sessionId: savedSessionId, uuid: userData.uuid, action: "addPlayer", roomId });
+    });
+    socket.on("available-games-list", (list) => {
+      setAvailableGames(list);
     });
     socket.on("room-info-update", (data) => { setRoomData(data); setStatus("READY"); });
     socket.on("room-closed", () => router.push("/project/Aether"));
@@ -44,6 +50,26 @@ export default function RoomClientPage({ roomId }) {
       sessionId: localStorage.getItem("AETHER_SESSION_ID"),
       uuid: user.uuid, action, roomId, data
     });
+  };
+
+  const GameView = useMemo(() => {
+    const isInGame = roomData?.status === "PLAYING" || roomData?.status === "FINISHED";
+    if (!isInGame || !roomData?.ruleId) return null;
+    
+    return dynamic(() => import(`@/game-scripts/${roomData.ruleId}/view.jsx`), {
+      loading: () => (
+        <div className="flex flex-col items-center justify-center h-full text-blue-400 font-mono text-xs">
+          <Loader2 className="animate-spin mb-2" size={20} />
+          LOADING ENGINE...
+        </div>
+      ),
+      ssr: false // 必须禁用 SSR，因为游戏视图依赖浏览器 Socket
+    });
+  }, [roomData?.status, roomData?.ruleId]);
+
+  const sendGameAction = (action, data = {}) => {
+    if (!socketRef.current) return;
+    socketRef.current.emit("game-action", { action, data });
   };
 
   if (status !== "READY" || !roomData) {
@@ -96,6 +122,7 @@ export default function RoomClientPage({ roomId }) {
                         <select 
                           className="appearance-none bg-blue-400/5 border border-transparent hover:border-blue-300/50 rounded px-1 pr-4 text-xs font-black text-slate-700 focus:outline-none cursor-pointer transition-all"
                           value={roomData.seats.length}
+                          disabled={!isHost || roomData.status !== "WAITING"}
                           onChange={(e) => dispatch("updateConfig", { config: { maxSeats: parseInt(e.target.value) } })}
                         >
                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
@@ -121,11 +148,11 @@ export default function RoomClientPage({ roomId }) {
                   {/* 3. 移除多余的嵌套 div，保持结构清晰 */}
                   <div className="relative flex items-center">
                     <select 
-                      disabled={!isHost}
+                      disabled={!isHost || roomData.status !== "WAITING"}
                       className={`
                         appearance-none 
                         /* 高度调节：h-[20px] | 宽度定死：w-[78px] */
-                        h-[20px] w-[120px]
+                        h-[20px] w-[100px]
                         bg-blue-400/10 backdrop-blur-md 
                         border border-blue-300/50 
                         /* 稍微调整 padding 为箭头留出空间 */
@@ -137,8 +164,11 @@ export default function RoomClientPage({ roomId }) {
                       value={roomData.ruleId}
                       onChange={(e) => dispatch("updateConfig", { config: { ruleId: e.target.value } })}
                     >
-                      <option value="rps" className="text-slate-900 bg-white">石头剪刀布</option>
-                      <option value="mahjong" className="text-slate-900 bg-white">麻将</option>
+                    {availableGames.map(game => (
+                        <option key={game.id} value={game.id} className="text-slate-900 bg-white">
+                          {game.name}
+                        </option>
+                      ))}
                     </select>
                     
                     {/* 下拉小箭头 */}
@@ -175,42 +205,36 @@ export default function RoomClientPage({ roomId }) {
 
           {/* 右侧：规则主体区 */}
           <div className="flex-[4] h-full flex flex-col overflow-hidden">
-            <div className="flex items-center gap-2 mb-3 text-blue-600/60 font-bold text-[10px] uppercase tracking-widest">
-              <BookOpen size={14} className="text-blue-400"/> 
-              游戏规则说明
-            </div>
             
-            {/* 滚动条容器优化：增加 overflow-hidden 的父级并设置 padding 确保尖角不溢出圆角 */}
+            {/* 原有的“游戏规则说明” div 已删除，此处直接开始容器 */}
+            
             <div className="flex-1 bg-blue-900/5 rounded-[1.8rem] border border-blue-200/20 shadow-inner relative overflow-hidden">
               <div className="absolute inset-0 p-5 overflow-y-auto aether-scrollbar">
                 <div className="text-xs leading-relaxed text-slate-500 font-medium">
+                  
+                  {/* 动态标题：保持顶格展示 */}
                   <p className="mb-3 text-slate-600 text-sm font-black flex items-center gap-2">
-                     <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
-                     {roomData.ruleId === 'rps' ? "Aether-RPS v1.0" : "Aether-Mahjong v2.4"}
+                    <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
+                    {roomData.meta?.name || "加载协议中..."} 
+                    <span className="text-[12px] font-normal opacity-40 ml-auto uppercase tracking-tighter">
+                      Version v{roomData.meta?.version || "1.0"}
+                    </span>
                   </p>
-                  {roomData.ruleId === 'rps' ? (
-                    <ul className="space-y-2 opacity-80">
-                      <li className="flex gap-2"><span>•</span><span>标准零和博弈机制：石头胜剪刀，剪刀胜布，布胜石头。</span></li>
-                      <li className="flex gap-2"><span>•</span><span>多轮并行逻辑：系统自动识别所有玩家手势并实时结算。</span></li>
-                      <li className="flex gap-2"><span>•</span><span>超时惩罚：若在规定时间内未出拳，将判定为自动弃权。</span></li>
-                      <li className="mt-2 p-3 bg-white/40 rounded-xl border border-blue-100 text-[10px]">
-                        * Aether 提示：在多人对局中，系统将根据各玩家之间的胜负链条自动构建结算矩阵。
-                      </li>
-                    </ul>
-                  ) : (
-                    <ul className="space-y-2 opacity-80">
-                      <li className="flex gap-2"><span>•</span><span>全流程立直麻将逻辑：包含吃、碰、杠、听及自摸判断。</span></li>
-                      <li className="flex gap-2"><span>•</span><span>136张标准牌池，支持实时番数计算与符数结算。</span></li>
-                      <li className="flex gap-2"><span>•</span><span>振听规则严格校验，确保对局公平性与竞技深度。</span></li>
-                      <li className="mt-2 p-3 bg-white/40 rounded-xl border border-blue-100 text-[10px]">
-                        * Aether 提示：请确保网络连接稳定，麻将协议对时延同步要求较高。
-                      </li>
-                    </ul>
-                  )}
-                  <div className="h-20"></div>
-                  <p className="border-t border-blue-200/20 pt-4 italic text-[10px] text-blue-400">
-                    底部协议结束标志：EOF_AETHER_STATION
-                  </p>
+
+                  {/* 核心描述：增加稍微明显的对比度 */}
+                  <div className="space-y-4 text-slate-500/90 whitespace-pre-line text-[11px]">
+                    {roomData.meta?.description || "正在读取列车运行规程..."}
+                  </div>
+
+                  {/* 人数限制标签：缩小内边距以节省空间 */}
+                  <div className="mt-4 flex gap-2">
+                    <div className="px-2 py-0.5 bg-blue-500/5 rounded-md border border-blue-200/30 text-[9px] text-blue-400 font-bold">
+                      最少游玩人数: {roomData.meta?.minPlayers || 1}
+                    </div>
+                    <div className="px-2 py-0.5 bg-indigo-500/5 rounded-md border border-indigo-200/30 text-[9px] text-indigo-400 font-bold">
+                      最多游玩人数: {roomData.meta?.maxPlayers || 12}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -219,7 +243,9 @@ export default function RoomClientPage({ roomId }) {
       </section>
 
       {/* 2. 中心区域 & 3. 底部操作保持 */}
-      <main className="flex-1 w-full max-w-6xl mx-auto flex items-center px-6 gap-6">
+      <main className="flex-1 w-full max-w-6xl mx-auto flex items-center px-6 gap-6 relative"> 
+      {roomData.status === "WAITING" ? (
+      <div className="flex-1 w-full max-w-6xl mx-auto flex items-center px-6 gap-6">
         <div className="flex-1 flex items-center justify-center relative scale-[0.75] origin-center">
           <div className="relative w-[260px] h-[260px]">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white to-blue-50 shadow-[15px_15px_40px_rgba(148,163,184,0.15)] flex items-center justify-center border border-white">
@@ -227,7 +253,6 @@ export default function RoomClientPage({ roomId }) {
                 <span className="text-xl font-black opacity-[0.05] tracking-[0.3em] text-blue-900">AETHER</span>
               </div>
             </div>
-
             {roomData.seats.map((seat, i) => {
               const angle = i * (360 / roomData.seats.length);
               const radius = 190;
@@ -273,69 +298,85 @@ export default function RoomClientPage({ roomId }) {
             })}
           </div>
         </div>
+        {/* 找到右侧侧边栏区域，修改为如下结构 */}
+        <div className="w-[340px] h-full max-h-[360px] flex flex-col relative group/sidebar">
+          {/* h-full 和 max-h-[520px] 确保它不会无限拉长，
+            max-h 的值可以根据你桌子的 scale(0.75) 后的视觉高度微调
+          */}
+          <div className="flex-1 overflow-y-auto pr-2 aether-scrollbar">
+            <div className="flex flex-col gap-2.5">
+              {roomData.seats.map((seat, i) => (
+                <div key={i} className={`
+                  relative p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 cursor-pointer backdrop-blur-md shrink-0
+                  ${seat 
+                      ? seat.uuid === roomData.hostId 
+                        ? "bg-amber-50/80 border-amber-200 shadow-sm" 
+                        : "bg-white/50 border-white shadow-sm" 
+                      : "bg-white/10 border-dashed border-blue-200 opacity-60"}
+                `}>
+                  <div className="relative z-10">
+                    <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 ${
+                      seat?.uuid === roomData.hostId 
+                        ? 'border-amber-400' 
+                        : roomData.readyStatus[seat?.uuid] ? 'border-emerald-400' : 'border-white'
+                    }`}>
+                      {seat && <img src={`/avatar/${seat.avatar}.png`} className={`w-full h-full object-cover ${roomData.readyStatus[seat.uuid] ? 'opacity-40' : ''}`} />}
+                    </div>
+                    {seat && seat.uuid !== roomData.hostId && roomData.readyStatus[seat.uuid] && (
+                      <CheckCircle className="absolute inset-0 m-auto text-emerald-500" size={20}/>
+                    )}
+                  </div>
 
-{/* 找到右侧侧边栏区域，修改为如下结构 */}
-<div className="w-[340px] h-full max-h-[360px] flex flex-col relative group/sidebar">
-  {/* h-full 和 max-h-[520px] 确保它不会无限拉长，
-    max-h 的值可以根据你桌子的 scale(0.75) 后的视觉高度微调
-  */}
-  <div className="flex-1 overflow-y-auto pr-2 aether-scrollbar">
-    <div className="flex flex-col gap-2.5">
-      {roomData.seats.map((seat, i) => (
-        <div key={i} className={`
-          relative p-3 rounded-2xl border transition-all duration-300 flex items-center gap-4 cursor-pointer backdrop-blur-md shrink-0
-          ${seat 
-              ? seat.uuid === roomData.hostId 
-                ? "bg-amber-50/80 border-amber-200 shadow-sm" 
-                : "bg-white/50 border-white shadow-sm" 
-              : "bg-white/10 border-dashed border-blue-200 opacity-60"}
-        `}>
-          <div className="relative z-10">
-            <div className={`w-10 h-10 rounded-xl overflow-hidden border-2 ${
-              seat?.uuid === roomData.hostId 
-                ? 'border-amber-400' 
-                : roomData.readyStatus[seat?.uuid] ? 'border-emerald-400' : 'border-white'
-            }`}>
-              {seat && <img src={`/avatar/${seat.avatar}.png`} className={`w-full h-full object-cover ${roomData.readyStatus[seat.uuid] ? 'opacity-40' : ''}`} />}
+                  <div className="flex-1 z-10 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[15px] font-black italic text-slate-700 truncate">{seat?.username || "待加入"}</span>
+                      {seat && (
+                        <span className={`text-[11px] px-2 py-0.5 rounded-md font-black shadow-sm tracking-wider whitespace-nowrap ${
+                          seat.uuid === roomData.hostId ? "bg-amber-400 text-white" : 
+                          roomData.readyStatus[seat.uuid] ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"
+                        }`}>
+                          {seat.uuid === roomData.hostId ? "房主" : roomData.readyStatus[seat.uuid] ? "已准备" : "未准备"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[12px] font-mono text-blue-500 tracking-tighter italic">
+                      ID: {seat?.uuid.slice(0,8) || "--------"}
+                    </div>
+                  </div>
+
+                  {isHost && seat && seat.uuid !== user.uuid && (
+                    <button onClick={(e) => {e.stopPropagation(); dispatch("kickPlayer", { targetUuid: seat.uuid });}} className="p-2 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors">
+                      <UserMinus size={22}/>
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
-            {seat && seat.uuid !== roomData.hostId && roomData.readyStatus[seat.uuid] && (
-              <CheckCircle className="absolute inset-0 m-auto text-emerald-500" size={20}/>
-            )}
           </div>
-
-          <div className="flex-1 z-10 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-[15px] font-black italic text-slate-700 truncate">{seat?.username || "待加入"}</span>
-              {seat && (
-                <span className={`text-[11px] px-2 py-0.5 rounded-md font-black shadow-sm tracking-wider whitespace-nowrap ${
-                  seat.uuid === roomData.hostId ? "bg-amber-400 text-white" : 
-                  roomData.readyStatus[seat.uuid] ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-500"
-                }`}>
-                  {seat.uuid === roomData.hostId ? "房主" : roomData.readyStatus[seat.uuid] ? "已准备" : "未准备"}
-                </span>
-              )}
+          
+          {/* 装饰性渐变：当人数多产生滚动时，底部边缘会显得更平滑 */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#cfdef3]/50 to-transparent pointer-events-none rounded-b-2xl"></div>
+        </div>
+      </div>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center animate-in fade-in zoom-in duration-700">
+          {GameView ? (
+            <GameView 
+              gameState={roomData.gameState} 
+              players={roomData.seats}
+              myUuid={user.uuid}
+              onAction={sendGameAction} 
+            />
+          ) : (
+            <div className="text-blue-400 font-mono text-xs animate-pulse">
+              INITIALIZING GAME ENGINE...
             </div>
-            <div className="text-[12px] font-mono text-blue-500 tracking-tighter italic">
-              ID: {seat?.uuid.slice(0,8) || "--------"}
-            </div>
-          </div>
-
-          {isHost && seat && seat.uuid !== user.uuid && (
-            <button onClick={(e) => {e.stopPropagation(); dispatch("kickPlayer", { targetUuid: seat.uuid });}} className="p-2 text-red-300 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors">
-              <UserMinus size={22}/>
-            </button>
           )}
         </div>
-      ))}
-    </div>
-  </div>
-  
-  {/* 装饰性渐变：当人数多产生滚动时，底部边缘会显得更平滑 */}
-  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#cfdef3]/50 to-transparent pointer-events-none rounded-b-2xl"></div>
-</div>
+        )}
       </main>
-
-      <footer className="h-24 flex justify-center items-center pb-6">
+      {roomData.status === "WAITING" && (
+        <footer className="h-24 flex justify-center items-center pb-6">
         {isHost ? (
           <button onClick={() => dispatch("startGame")} className="px-16 py-3.5 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-2xl font-black text-lg shadow-[0_10px_25px_rgba(59,130,246,0.3)] transition-all active:scale-95 flex items-center gap-3 tracking-[0.1em]">
             <Play fill="white" size={18}/> 游戏开始
@@ -346,7 +387,7 @@ export default function RoomClientPage({ roomId }) {
           </button>
         )}
       </footer>
-
+      )}
       <style jsx global>{`
         .aether-scrollbar::-webkit-scrollbar {
           width: 4px;

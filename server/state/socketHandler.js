@@ -4,6 +4,38 @@ const Database = require("better-sqlite3");
 const db = new Database('database.db');
 const { v4: uuidv4 } = require('uuid');
 const Room = require("../core/Room");
+const fs = require("fs");
+const path = require("path");
+
+// === 游戏引擎元数据加载逻辑 ===
+
+function reloadGameMetas() {
+  const scriptsPath = path.join(process.cwd(), "game-scripts");
+  const folders = fs.readdirSync(scriptsPath);
+  const newMetaMap = {};
+
+  folders.forEach(folder => {
+    const metaFile = path.join(scriptsPath, folder, "meta.json");
+    if (fs.existsSync(metaFile)) {
+      try {
+        const metaContent = JSON.parse(fs.readFileSync(metaFile, "utf-8"));
+        // 使用文件夹名作为唯一标识 ID，并注入到对象中
+        newMetaMap[folder] = { 
+          ...metaContent, 
+          id: folder 
+        };
+        console.log(`[Aether Engine] 成功装载游戏元数据: [${folder}] - ${metaContent.name}`);
+      } catch (err) {
+        console.error(`[Aether Engine] 解析 ${folder}/meta.json 失败:`, err);
+      }
+    }
+  });
+
+  global.gameMetaMap = newMetaMap;
+}
+
+// 启动时立即扫描一次
+reloadGameMetas();
 
 // 内存存储：存储所有活跃房间实例
 let rooms = {};
@@ -338,7 +370,28 @@ module.exports = function(io) {
           return socket.emit("room-conflict", { currentRoomId: userRoomMap[user.uuid] });
         }
         const newId = Math.floor(1000 + Math.random() * 9000).toString();
-        const newRoom = new Room(newId, data.ruleId, user);
+        const meta = global.gameMetaMap[data.ruleId] || { name: "未知规则", description: "暂无说明" };
+        const newRoom = new Room(newId, data.ruleId, user, meta);
+        newRoom.onStateChange = () => {
+          // 1. 找到所有在座的玩家
+          newRoom.seats.forEach(seat => {
+            if (!seat) return;
+            // 2. 找到该玩家对应的所有 Socket 实例（考虑到多开，虽然我们限制了单开，但这样更稳健）
+            // 技巧：Socket.io 允许通过 uuid 逻辑查找到对应的 socket
+            const targetEntries = Object.entries(globalState.onlineUsers).filter(([sid, u]) => u.uuid === seat.uuid);
+            
+            targetEntries.forEach(([sid]) => {
+              const targetSocket = io.sockets.sockets.get(sid);
+              if (targetSocket) {
+                // 3. 调用 Room 的带脱敏序列化，发给特定的人
+                targetSocket.emit("room-info-update", newRoom.serialize(seat.uuid));
+              }
+            });
+          });
+          
+          // 4. (可选) 给不在座位上但在房间频道里的旁观者发一份“上帝视角”或“全盲视角”的数据
+          // 这里暂时复用 room-info-update 逻辑
+        };
         rooms[newId] = newRoom;
         userRoomMap[user.uuid] = newId;
         socket.currentRoomId = newId; // 挂载到 socket 用于断线处理
@@ -371,6 +424,7 @@ module.exports = function(io) {
             userRoomMap[user.uuid] = roomId;
             socket.currentRoomId = roomId;
             socket.join(`room-${roomId}`);
+            socket.emit("room-info-update", room.serialize(user.uuid));
         } 
         
         else if (action === "closeRoom") {
@@ -417,7 +471,7 @@ module.exports = function(io) {
 
         // 3. 同步状态 (只有房间还没被删时才发 room-info-update)
         if (rooms[roomId]) {
-            io.to(`room-${roomId}`).emit("room-info-update", room.serialize());
+          room.onStateChange();
         }
 
         // 4. 全局广播
@@ -429,7 +483,50 @@ module.exports = function(io) {
     } else if (result.msg) {
         socket.emit("op-feedback", { type: 'error', message: result.msg });
     }
-});
+    });
+
+    socket.on("game-action", ({ action, data }) => {
+      const roomId = socket.currentRoomId;
+      const room = rooms[roomId];
+      if (!room || room.status !== 'PLAYING') return;
+    
+      // 1. 找到当前 Socket 对应的 User UUID
+      const onlineUser = globalState.onlineUsers[socket.id];
+      if (!onlineUser || !onlineUser.uuid) return;
+    
+      // 2. 转发给房间分发器
+      // Room.js 的 dispatch 会识别出这不是管理指令，从而转给 handleGameAction
+      const result = room.dispatch(action, { ...data, uuid: onlineUser.uuid });
+    
+      if (result.success) {
+        // 3. 执行成功后，触发脱敏广播
+        room.broadcastState();
+      } else if (result.msg) {
+        socket.emit("op-feedback", { type: 'error', message: result.msg });
+      }
+    });
+
+    // 接口：提供所有可用游戏的简易菜单 (用于下拉列表)
+    socket.on("get-available-games", () => {
+      
+      const list = Object.values(global.gameMetaMap).map(m => ({ 
+        id: m.id, 
+        name: m.name,
+        minPlayers: m.minPlayers,
+        maxPlayers: m.maxPlayers 
+      }));
+      socket.emit("available-games-list", list);
+    });
+
+    // 接口：获取特定 ID 的详细 Meta (按索引访问)
+    socket.on("get-game-meta", (ruleId) => {
+      const meta = global.gameMetaMap[ruleId];
+      if (meta) {
+        socket.emit("game-meta-detail", meta);
+      } else {
+        socket.emit("op-feedback", { type: 'error', message: '未找到该规则详情' });
+      }
+    });
 
     // 获取当前所有房间
     socket.on("get-rooms", () => {

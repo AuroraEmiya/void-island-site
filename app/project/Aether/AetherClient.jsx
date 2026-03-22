@@ -558,7 +558,7 @@ export default function AetherClient({}) {
                           #{room.roomId} 站台
                         </h3>
                         <p className="text-[15px] opacity-60 uppercase tracking-widest mt-0.5">
-                          Rule: {room.ruleId === 'rps' ? '猜拳终端' : '未知协议'}
+                          Rule: {room.meta?.name || ("未知规则")}
                         </p>
                       </div>
                       <span className={`px-3 py-0.5 rounded-full text-[9px] font-bold ${

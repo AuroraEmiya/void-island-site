@@ -1,0 +1,8 @@
+{
+    "id": "rps",
+    "name": "石头剪刀布",
+    "version": "1.0.0",
+    "minPlayers": 2,
+    "maxPlayers": 8,
+    "description": "这是本站的第一个测试游戏脚本。多人确定出拳结果后，系统将自动判定胜负。"
+  }
