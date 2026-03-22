@@ -88,14 +88,14 @@
   "subProjects": [
     {
       "title": "天境列车",
-      "color": "silver",
-      "description": "尚未到站，第一班列车将于1个潮汐周期后到达",
+      "color": "#B2FEFA",
+      "description": "第一班车已经抵达！",
       "ID": "Aether"
     },
     {
       "title": "星伞计划",
       "color": "pink",
-      "description": "项目主页已建立！",
+      "description": "项目静默中",
       "ID": "Celis"
     },
     {
