@@ -52,7 +52,7 @@ export default function RPSView({ gameState, players, myUuid, onAction }) {
                 <div className={`px-2 py-0.5 rounded-md text-[12px] font-black uppercase tracking-tighter shadow-sm
                   ${choice === 'WAITING' ? "bg-emerald-500 text-white animate-pulse" : "bg-white/80 text-blue-800"}
                 `}>
-                  {choice === 'WAITING' ? "已完成选择" : ((choice === 'rock' ? '✊ 石头' : choice === 'paper' ? '✋ 布' : '✌️ 剪刀') || "思考中...")}
+                  {choice === 'WAITING' ? "已完成选择" : (choice === 'rock' ? '✊ 石头' : choice === 'paper' ? '✋ 布' : choice === 'scissor' ? '✌️ 剪刀' : "思考中...")}
                 </div>
               </div>
             </div>}
