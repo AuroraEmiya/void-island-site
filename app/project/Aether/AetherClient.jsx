@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import io from "socket.io-client";
 import ReturnMenus from "@/components/ReturnMenus";
 import { useTheme } from "@/lib/theme";
+import BlogModal from "@/components/BlogModal";
 // 假设你通过 Context 或 Props 获取主题，这里预留变量
 // 如果你的项目使用特定的 class 如 .dark，本代码已做自动适配
 
-export default function AetherClient({}) {
+export default function AetherClient({ projects }) {
   const [socket, setSocket] = useState(null);
   const [onlineCount, setOnlineCount] = useState(0);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -29,7 +30,16 @@ export default function AetherClient({}) {
   const [newAccountInfo, setNewAccountInfo] = useState(null);
   const [toast, setToast] = useState(null);
   const [showAvatarModal, setShowAvatarModal] = useState(false); // 控制头像弹窗
-
+  const [activeProject, setActiveProject] = useState(null);
+	const [isMobile, setIsMobile] = useState(false);
+	useEffect(() => {
+		function handleResize() {
+			setIsMobile(window.innerWidth <= 768);
+		}
+		handleResize();
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
@@ -329,8 +339,8 @@ export default function AetherClient({}) {
           </div>
         </div>
       )}
-{/* 6. 侧边栏 (Sidebar) */}
-<aside className={`z-20 w-full md:w-80 md:min-h-screen border-b md:border-b-0 md:border-r p-6 flex flex-col shadow-2xl transition-all duration-700 ${
+      {/* 6. 侧边栏 (Sidebar) */}
+      <aside className={`z-20 w-full md:w-80 md:min-h-screen border-b md:border-b-0 md:border-r p-6 flex flex-col shadow-2xl transition-all duration-700 ${
         isDarkMode ? "bg-slate-900/40 border-slate-800" : "bg-white/30 border-white/50 backdrop-blur-xl"
       }`}>
         <div className="h-12 md:hidden"></div>
@@ -420,6 +430,38 @@ export default function AetherClient({}) {
               </div>
             </div>
 
+
+            {/* 📖 手册入口 */}
+            <div className="flex gap-3 mb-4 mt-3">
+            {projects
+              ?.slice() // 不污染原数组
+              .sort((a, b) => {
+                // 强制排序：userManual 在前
+                if (a.filename === "userManual") return -1;
+                if (b.filename === "userManual") return 1;
+                return 0;
+              }).map((proj, i) => {
+                const isUser = proj.filename === "userManual";
+                const isCreator = proj.filename === "creatorManual";
+                if (!isUser && !isCreator) return null;
+
+                return (
+                  <div
+                    key={proj.filename}
+                    onClick={() => setActiveProject(proj)}
+                    className={`flex-1 p-3 rounded-2xl cursor-pointer transition-all border shadow-lg hover:scale-[1.03] active:scale-95 text-center ${
+                      isDarkMode
+                        ? "bg-slate-800/60 border-slate-700 hover:bg-slate-700/70"
+                        : "bg-white/50 border-white/60 hover:bg-white/80 backdrop-blur-md"
+                    }`}
+                  >
+                    <p className="text-[12px] font-bold tracking-wide">
+                      {isUser ? "📘 用户手册" : "🛠️ 创作者手册"}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
             {/* 在线成员 (关键修改：增加 pb-100 避让播放器) */}
             <div className="mt-6 flex-1 flex flex-col min-h-0 overflow-hidden">
               <div className="flex items-center justify-between mb-3">
@@ -458,11 +500,46 @@ export default function AetherClient({}) {
             }`}>👤</div>
             <h3 className={`font-bold text-xl mb-10 tracking-tight ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>天境列车访客模式</h3>
             <div className="space-y-4 w-full">
-              <button onClick={() => socket.emit("auth-request", { createNewGuest: true })} className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all">获取临时车票</button>
+              <button onClick={() => socket.emit("auth-request", { createNewGuest: true })} className={`w-full py-4 rounded-2xl font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all ${
+                isDarkMode
+                  ? "bg-blue-900/60 text-blue-300 border border-blue-800"
+                  : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
+              }`}>获取临时车票</button>
               <button onClick={() => setShowLoginModal(true)} className={`w-full py-4 rounded-2xl font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all ${
                 isDarkMode ? 'bg-purple-900/60 text-purple-300 border border-purple-800' : 'bg-purple-600 text-white'
               }`}>出示已有车票</button>
             </div>
+              {/* 📖 手册入口 */}
+              <div className="flex gap-3 mb-4 mt-3  w-full">
+              {projects
+                ?.slice() // 不污染原数组
+                .sort((a, b) => {
+                  // 强制排序：userManual 在前
+                  if (a.filename === "userManual") return -1;
+                  if (b.filename === "userManual") return 1;
+                  return 0;
+                }).map((proj, i) => {
+                const isUser = proj.filename === "userManual";
+                const isCreator = proj.filename === "creatorManual";
+                if (!isUser && !isCreator) return null;
+
+                return (
+                  <div
+                    key={proj.filename}
+                    onClick={() => setActiveProject(proj)}
+                    className={`flex-1 p-3 rounded-2xl cursor-pointer transition-all border shadow-lg hover:scale-[1.03] active:scale-95 text-center ${
+                      isDarkMode
+                        ? "bg-slate-800/60 border-slate-700 hover:bg-slate-700/70"
+                        : "bg-white/50 border-white/60 hover:bg-white/80 backdrop-blur-md"
+                    }`}
+                  >
+                    <p className="text-[12px] font-bold tracking-wide  whitespace-nowrap">
+                      {isUser ? "📘 用户手册" : "🛠️ 创作者手册"}
+                    </p>
+                  </div>
+                );
+              })}
+              </div>
           {/* 新增：在线成员（访客状态下） */}
           <div className="mt-10 flex-1 flex flex-col min-h-0 overflow-hidden w-full">
             <div className="flex items-center justify-between mb-3">
@@ -497,8 +574,8 @@ export default function AetherClient({}) {
         )}
       </aside>
 
-{/* 7. 主内容区 (Room System) */}
-<section className="flex-1 relative p-6 md:p-12 flex flex-col h-screen overflow-hidden">
+      {/* 7. 主内容区 (Room System) */}
+      <section className="flex-1 relative p-6 md:p-12 flex flex-col h-screen overflow-hidden">
         <div className="h-12 md:hidden"></div>
         {/* 将内边距从 p-12 稍微收缩到 p-10，腾出垂直空间 */}
         <div className={`flex-1 rounded-[3.5rem] border shadow-inner flex flex-col items-center justify-start text-center p-6 md:p-10 transition-all duration-700 overflow-hidden ${
@@ -651,6 +728,15 @@ export default function AetherClient({}) {
           mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
         }
       `}</style>
+      {activeProject && (
+      <BlogModal
+        title={activeProject.title}
+        content={activeProject.content}
+        onClose={() => setActiveProject(null)}
+        isMobile={isMobile}
+      />
+    )}
     </main>
+    
   );
 }

@@ -1,8 +1,6 @@
-class RPSLogic {
-  constructor(room) {
-    this.room = room;
-  }
+const BaseGame = require('../BaseGame');
 
+class RPSLogic  extends BaseGame {
   // 初始化全量状态
   setup() {
     return {
@@ -54,7 +52,6 @@ class RPSLogic {
         state.phase = 'REVEAL';
         // 这里的逻辑可以外挂 Python 处理状态推理
         this.calculateRound(state, alivePlayers);
-        this.room.broadcastState();
       }
     }
     return state;
