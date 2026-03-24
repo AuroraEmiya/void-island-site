@@ -475,9 +475,18 @@ module.exports = function(io) {
         }
 
         // 4. 全局广播
-        io.emit("update-room-list", {
-            rooms: Object.values(rooms).map(r => r.serialize()),
-            myRoomId: userRoomMap[user.uuid] || null
+        Object.entries(userRoomMap).forEach(([uuid, roomId]) => {
+          const targetSocketEntry = Object.entries(globalState.onlineUsers).find(([sid, u]) => u.uuid === uuid);
+          if (targetSocketEntry) {
+            const targetSocketId = targetSocketEntry[0];
+            const targetSocket = io.sockets.sockets.get(targetSocketId);
+            if (targetSocket) {
+              targetSocket.emit("update-room-list", {
+                rooms: Object.values(rooms).map(r => r.serialize()),
+                myRoomId: roomId
+              });
+            }
+          }
         });
 
     } else if (result.msg) {
@@ -500,6 +509,7 @@ module.exports = function(io) {
     
       if (result.success) {
         // 3. 执行成功后，触发脱敏广播
+        console.log(`[Room ${roomId}] 收到游戏操作指令: ${action}，由用户 ${onlineUser.uuid} 发起，数据:`, data);
         room.broadcastState();
       } else if (result.msg) {
         socket.emit("op-feedback", { type: 'error', message: result.msg });
