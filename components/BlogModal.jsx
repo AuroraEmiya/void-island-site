@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import { useTheme } from "@/lib/theme";
 
 export default function BlogModal({ title, excerpt, content, onClose, isMobile, forceTheme = null }) {
@@ -75,6 +76,7 @@ export default function BlogModal({ title, excerpt, content, onClose, isMobile, 
           ) : (
             <ReactMarkdown
               rehypePlugins={[rehypeRaw]}
+              remarkPlugins={[remarkGfm]}
               components={{
                 h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
                 h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
@@ -121,6 +123,36 @@ export default function BlogModal({ title, excerpt, content, onClose, isMobile, 
                   </a>
                 ),
                 font: ({ color, children }) => <span style={{ color }}>{children}</span>,
+                table: ({ children }) => (
+                  <table className="table-auto border-collapse border border-gray-400 w-full mb-4">
+                    {children}
+                  </table>
+                ),
+                thead: ({ children }) => (
+                  <thead className="bg-gray-200">
+                    {children}
+                  </thead>
+                ),
+                tbody: ({ children }) => (
+                  <tbody>
+                    {children}
+                  </tbody>
+                ),
+                tr: ({ children }) => (
+                  <tr className="border-b border-gray-300">
+                    {children}
+                  </tr>
+                ),
+                th: ({ children }) => (
+                  <th className="px-4 py-2 border border-gray-400 text-left font-semibold">
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="px-4 py-2 border border-gray-400">
+                    {children}
+                  </td>
+                ),
               }}
             >
               {markdown}
