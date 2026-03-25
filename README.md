@@ -46,13 +46,16 @@ This site exists to archive the fragments of my past memories and the unfolding 
 ### 🏗️ Getting Started
 
 ```bash
+# First, generate a pseudo real-time update log
+bash ./commit-log-generate.sh
+
 # Install dependencies
 npm install
 
 # Run development server
 npm run dev
 
-# Build and start production
+# (Optional) build and start production
 npm run build
 npm start
 
@@ -102,13 +105,16 @@ npm start
 ### 🏗️ 本地开发
 
 ```bash
+# 首先，生成一个伪实时更新日志
+bash ./commit-log-generate.sh
+
 # 安装依赖
 npm install
 
 # 启动开发服务器
 npm run dev
 
-# 生产环境构建与启动
+# (可选) 如果需要生产环境，使用下列命令构建与启动
 npm run build
 npm start
 
