@@ -121,7 +121,7 @@ title: 友情链接
            style="width: 56px; height: 56px; border-radius: 50%; margin-right: 14px;" />
       <div>
         <div style="font-size: 18px; font-weight: 600;">
-          Kylin 的个人博客，记录与表达的空间
+          超级厉害的Kylin姐姐！
         </div>
         <div style="font-size: 13px; font-style: italic; opacity: 0.7; margin-top: 4px;">
           tomemorizemyyouth.github.io
