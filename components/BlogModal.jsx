@@ -112,12 +112,17 @@ export default function BlogModal({ title, excerpt, content, onClose, isMobile, 
                     {children}
                   </blockquote>
                 ),
-                a: ({ href, children }) => (
+                a: ({ href, children, ...props }) => (
                   <a
+                    {...props}   // 👈 关键！！保留你在 md 里写的 class / style
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 underline"
+                    className={
+                      props.className
+                        ? props.className
+                        : "text-blue-600 underline"
+                    }
                   >
                     {children}
                   </a>

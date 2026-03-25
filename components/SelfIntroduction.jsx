@@ -105,43 +105,92 @@ export default function SelfIntroduction({
         <hr style={{ border: "1px solid white", margin: "10px 0" }} />
 
         {/* 兴趣链接 */}
-        <div>
-          {sectionsConfig.selfIntroduce.interest_link.map((item, idx) => (
-            <p
-              key={idx}
-              onClick={() => openModal(item.link)} // 点击时打开对应的弹窗
-              style={{
-                cursor: "pointer",
-                textDecoration: "underline",
-                color: "lightblue",
-              }}
-            >
-              {item.description}
-            </p>
-          ))}
+        <div
+          style={{
+            background: "rgba(255,255,255,0.08)",
+            borderRadius: "12px",
+            padding: "10px",
+            boxShadow: "inset 2px 2px 6px rgba(0,0,0,0.3), inset -2px -2px 6px rgba(255,255,255,0.05)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "14px",
+              marginBottom: "8px",
+              opacity: 0.8,
+            }}
+          >
+            🎧 兴趣
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "8px",
+            }}
+          >
+            {sectionsConfig.selfIntroduce.interest_link.map((item, idx) => (
+              <div
+                key={idx}
+                onClick={() => openModal(item.link)}
+                style={{
+                  cursor: "pointer",
+                  padding: "8px 10px",
+                  borderRadius: "8px",
+                  background: "linear-gradient(145deg, #6a6a6a, #4e4e4e)",
+                  boxShadow:
+                    "3px 3px 6px rgba(0,0,0,0.4), -2px -2px 5px rgba(255,255,255,0.1)",
+                  fontSize: "12px",
+                  textAlign: "center",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "5px 5px 10px rgba(0,0,0,0.5), -3px -3px 6px rgba(255,255,255,0.15)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "none";
+                  e.currentTarget.style.boxShadow =
+                    "3px 3px 6px rgba(0,0,0,0.4), -2px -2px 5px rgba(255,255,255,0.1)";
+                }}
+              >
+                {item.description}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 分隔线 */}
         <hr style={{ border: "1px solid white", margin: "10px 0" }} />
 
         {/* 友情链接 */}
-        <div>
-          <p style={{ fontWeight: "bold", marginBottom: "5px" }}>友情链接：</p>
-          {sectionsConfig.selfIntroduce.friendship_link.map((item, idx) => (
-            <p key={idx}>
-              <a
-                href={item.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  color: "lightgreen",
-                  textDecoration: "underline",
-                }}
-              >
-                {item.description}
-              </a>
-            </p>
-          ))}
+        <div
+          onClick={() => openModal("FriendLinks")}
+          style={{
+            cursor: "pointer",
+            padding: "12px",
+            borderRadius: "12px",
+            background: "linear-gradient(145deg, #5fa8ff, #3f7fdc)",
+            boxShadow:
+              "4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(255,255,255,0.2)",
+            textAlign: "center",
+            fontWeight: "600",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow =
+              "6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(255,255,255,0.25)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "none";
+            e.currentTarget.style.boxShadow =
+              "4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(255,255,255,0.2)";
+          }}
+        >
+          🌐 友情链接(已有7人！)
         </div>
       </div>
     </div>
